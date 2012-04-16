@@ -1,0 +1,7 @@
+source 'https://rubygems.org'
+
+gem 'indis-core', :git => 'git://github.com/indis/indis-core.git', :group => :test
+gem 'indis-macho', :git => 'git://github.com/indis/indis-macho.git', :group => :test
+gem 'rake', :group => :test
+
+gemspec
