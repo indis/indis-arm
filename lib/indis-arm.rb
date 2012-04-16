@@ -19,6 +19,7 @@
 require 'indis-arm/version'
 
 module Indis
+  # Indis::ARM provides instruction parser for ARM and Thumb instruction sets.
   module ARM
 
   end
