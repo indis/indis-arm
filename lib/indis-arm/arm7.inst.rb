@@ -78,6 +78,7 @@ instruction :B do # 8.8.18
            value_const: '#{sprintf("0x%x", @vmaddr+8+@imm)}'
     process do |k|
       @imm = h.SignExtend(k.imm24.to_boz(24) << 2, 32).to_signed_i
+      @value_format = :value_const
     end
   end
 end
@@ -119,6 +120,7 @@ instruction :BL do # 8.8.25
     process do |k|
       @imm = h.SignExtend(k.imm24.to_boz(24) << 2, 32).to_signed_i
       @target_instr_set = :arm
+      @value_format = :value_const
     end
   end
   encoding :A2 do
@@ -131,6 +133,7 @@ instruction :BL do # 8.8.25
       # FIXME what is H used for?..
       @imm = h.SignExtend(k.imm24.to_boz(24) << 2, 32).to_signed_i
       @target_instr_set = :thumb
+      @value_format = :value_const
     end
   end
 end
