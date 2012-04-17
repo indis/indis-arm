@@ -17,6 +17,7 @@
 ##############################################################################
 
 require 'indis-arm/version'
+require 'indis-arm/code_parser'
 
 module Indis
   # Indis::ARM provides instruction parser for ARM and Thumb instruction sets.
