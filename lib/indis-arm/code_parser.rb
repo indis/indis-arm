@@ -42,6 +42,12 @@ module Indis
           @state.pc = virt_addr + 8 # XXX: 4 for thumb
           
           bytes = io.read(4)
+
+          unless @map.has_unmapped(virt_addr, 4)
+            virt_addr += 4 # TODO: skip 2 for thumb
+            next
+          end
+          
           i = build_instruction(virt_addr, bytes.unpack('V')[0])
           @map.map(i)
           @target.publish_event(:instruction_mapped, i)
