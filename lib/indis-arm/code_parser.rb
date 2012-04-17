@@ -44,6 +44,7 @@ module Indis
           bytes = io.read(4)
           i = build_instruction(virt_addr, bytes.unpack('V')[0])
           @map.map(i)
+          @target.publish_event(:instruction_mapped, i)
           
           if i.size == 2
             io.ungetbyte(bytes[2..-1])
