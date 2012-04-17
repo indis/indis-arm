@@ -72,13 +72,14 @@ instruction :B do # 8.8.18
   encoding :T3
   encoding :T4
   encoding :A1 do
-    attrs :cond, :imm
+    attrs :cond, :imm, :branch_address
     bits 'CCCC1010iiiiiiiiiiiiiiiiiiiiiiii', 'i' => :imm24
     format value:       '##{@imm}',
-           value_const: '#{sprintf("0x%x", @vmaddr+8+@imm)}'
+           value_const: '#{sprintf("0x%x", @branch_address)}'
     process do |k|
       @imm = h.SignExtend(k.imm24.to_boz(24) << 2, 32).to_signed_i
       @value_format = :value_const
+      @branch_address = @vmaddr+8+@imm
     end
   end
 end
@@ -113,27 +114,29 @@ instruction :BL do # 8.8.25
   encoding :T1
   encoding :T2
   encoding :A1 do
-    attrs :cond, :imm, :target_instr_set
+    attrs :cond, :imm, :target_instr_set, :branch_address
     bits 'CCCC1011iiiiiiiiiiiiiiiiiiiiiiii', 'i' => :imm24
     format value:       '##{@imm}',
-           value_const: '#{sprintf("0x%x", @vmaddr+8+@imm)}'
+           value_const: '#{sprintf("0x%x", @branch_address)}'
     process do |k|
       @imm = h.SignExtend(k.imm24.to_boz(24) << 2, 32).to_signed_i
       @target_instr_set = :arm
       @value_format = :value_const
+      @branch_address = @vmaddr+8+@imm
     end
   end
   encoding :A2 do
-    attrs :imm, :target_instr_set
+    attrs :imm, :target_instr_set, :branch_address
     bits '1111101Hiiiiiiiiiiiiiiiiiiiiiiii', 'i' => :imm24, 'H' => :h
     format operator:    'BLX',
            value:       '##{@imm}',
-           value_const: '#{sprintf("0x%x", @vmaddr+8+@imm)}'
+           value_const: '#{sprintf("0x%x", @branch_address)}'
     process do |k|
       # FIXME what is H used for?..
       @imm = h.SignExtend(k.imm24.to_boz(24) << 2, 32).to_signed_i
       @target_instr_set = :thumb
       @value_format = :value_const
+      @branch_address = @vmaddr+8+@imm
     end
   end
 end
