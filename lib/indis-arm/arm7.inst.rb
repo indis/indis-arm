@@ -75,7 +75,7 @@ instruction :B do # 8.8.18
     attrs :cond, :imm
     bits 'CCCC1010iiiiiiiiiiiiiiiiiiiiiiii', 'i' => :imm24
     format value:       '##{@imm}',
-           value_const: '#{sprintf("%08x", @va+8+@imm)}'
+           value_const: '#{sprintf("0x%x", @vmaddr+8+@imm)}'
     process do |k|
       @imm = h.SignExtend(k.imm24.to_boz(24) << 2, 32).to_signed_i
     end
@@ -115,7 +115,7 @@ instruction :BL do # 8.8.25
     attrs :cond, :imm, :target_instr_set
     bits 'CCCC1011iiiiiiiiiiiiiiiiiiiiiiii', 'i' => :imm24
     format value:       '##{@imm}',
-           value_const: '#{sprintf("%08x", @va+8+@imm)}'
+           value_const: '#{sprintf("0x%x", @vmaddr+8+@imm)}'
     process do |k|
       @imm = h.SignExtend(k.imm24.to_boz(24) << 2, 32).to_signed_i
       @target_instr_set = :arm
@@ -126,7 +126,7 @@ instruction :BL do # 8.8.25
     bits '1111101Hiiiiiiiiiiiiiiiiiiiiiiii', 'i' => :imm24, 'H' => :h
     format operator:    'BLX',
            value:       '##{@imm}',
-           value_const: '#{sprintf("%08x", @va+8+@imm)}'
+           value_const: '#{sprintf("0x%x", @vmaddr+8+@imm)}'
     process do |k|
       # FIXME what is H used for?..
       @imm = h.SignExtend(k.imm24.to_boz(24) << 2, 32).to_signed_i
