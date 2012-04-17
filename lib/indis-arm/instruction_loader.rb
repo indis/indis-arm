@@ -68,7 +68,7 @@ module Indis
         end
         
         name = @name
-        klass = Class.new(Indis::ARM::Instruction) { @name = name.to_s; @encoding = enc.to_s }
+        klass = Class.new(Indis::ARM::Instruction) { @name = name; @encoding = enc }
         ARM.const_set("#{name}Instruction_#{enc}", klass)
         
         ml = MnemonicLoader.new(klass)

@@ -29,11 +29,11 @@ describe Indis::ARM::InstructionLoader do
   end
   
   it "should set instruction name" do
-    Indis::ARM::PUSHInstruction_A1.name.should == 'PUSH'
+    Indis::ARM::PUSHInstruction_A1.name.should == :PUSH
   end
   
   it "should set instruction encoding" do
-    Indis::ARM::PUSHInstruction_A1.encoding.should == 'A1'
+    Indis::ARM::PUSHInstruction_A1.encoding.should == :A1
   end
   
   it "should raise NotThisInstructionError if the other mnemonic should be searched for" do
