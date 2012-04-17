@@ -5,6 +5,7 @@ require 'indis-arm/code_parser'
 describe Indis::ARM::CodeParser do
   it "should decode arm instructions in given section" do
     t = Indis::Target.new('spec/fixtures/single-object.o')
+    t.load
     
     section = t.segments.find { |seg| seg.name == '__TEXT' }.sections.find { |sect| sect.name == '__text' }
     
