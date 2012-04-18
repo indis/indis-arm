@@ -16,6 +16,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.    #
 ##############################################################################
 
+require 'stringio'
 require 'indis-arm/cpu_state'
 require 'indis-arm/instruction'
 require 'indis-arm/instruction_loader'
