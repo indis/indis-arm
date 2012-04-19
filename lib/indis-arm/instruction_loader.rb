@@ -47,6 +47,11 @@ module Indis
       # newly-created {Indis::ARM::EncodingLoader}.
       # @param [Symbol] name instruction name
       def instruction(name, &block)
+        unless block_given?
+          #puts "Encoding #{enc} of #{@name} is undefined yet"
+          return
+        end
+        
         el = EncodingLoader.new(name, @classes)
         el.instance_eval(&block)
       end

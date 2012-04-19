@@ -16,6 +16,8 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.    #
 ##############################################################################
 
+instruction :ADC # 8.8.1-8.8.3
+
 instruction :ADD do # 8.8.4-11
   encoding :T1_imm
   encoding :T2_imm
@@ -66,6 +68,12 @@ instruction :ADD do # 8.8.4-11
   encoding :A1_spreg
 end
 
+instruction :ADR # 8.8.12
+
+instruction :AND # 8.8.13-15
+
+instruction :ASR # 8.8.16-17
+
 instruction :B do # 8.8.18
   encoding :T1
   encoding :T2
@@ -84,7 +92,11 @@ instruction :B do # 8.8.18
   end
 end
 
-instruction :BIC do # 8.8.21
+instruction :BFC # 8.8.19
+
+instruction :BFI # 8.8.20
+
+instruction :BIC do # 8.8.21-23
   encoding :T1_imm
   encoding :A1_imm do
     attrs :cond, :setflags, :Rn, :Rd, :imm
@@ -109,6 +121,8 @@ instruction :BIC do # 8.8.21
   end
   encoding :A1_rsr
 end
+
+instruction :BKPT # 8.8.24
 
 instruction :BL do # 8.8.25
   encoding :T1
@@ -141,6 +155,24 @@ instruction :BL do # 8.8.25
   end
 end
 
+instruction :BLX # 8.8.26
+
+instruction :BX # 8.8.27
+
+instruction :BXJ # 8.8.28
+
+instruction :CBZ # 8.8.29 (a.i. CBNZ)
+
+instruction :CDP # 8.8.30 (a.i. CDP2)
+
+instruction :CHKA # 8.8.31
+
+instruction :CLREX # 8.8.32
+
+instruction :CLZ # 8.8.33
+
+instruction :CMN # 8.8.34-36
+
 instruction :CMP do # 8.8.37-39
   encoding :T1_imm
   encoding :T2_imm
@@ -159,6 +191,12 @@ instruction :CMP do # 8.8.37-39
   encoding :A1_rsr
 end
 
+instruction :CPS # 8.8.40
+
+instruction :CPY # 8.8.41
+
+instruction :DBG # 8.8.42
+
 instruction :DMB do # 8.8.43
   encoding :T1
   encoding :A1 do
@@ -173,6 +211,34 @@ instruction :DMB do # 8.8.43
     end
   end
 end
+
+instruction :DSB # 8.8.44
+
+instruction :ENTERX # 8.8.45
+
+instruction :EOR # 8.8.46-48
+
+instruction :ERET # 8.8.49
+
+# F* 8.8.50
+
+# HB, HBL, HBLP, HBP # 8.8.51
+
+instruction :HVC # 8.8.52
+
+instruction :ISB # 8.8.53
+
+instruction :IT # 8.8.54
+
+instruction :LDC # 8.8.55-56 (a.i. LDC2)
+
+instruction :LDM # 8.8.57-58 (a.i. LDMIA, LDMFD)
+
+instruction :LDMDA # 8.8.59 (a.i. LDMFA)
+
+instruction :LDMDB # 8.8.60 (a.i. LDMEA)
+
+instruction :LDMIB # 8.8.61 (a.i. LDMED)
 
 instruction :LDR do # 8.8.62-66
   encoding :T1_imm
@@ -263,6 +329,20 @@ instruction :LDR do # 8.8.62-66
     end
   end
 end
+
+instruction :LDRB # 8.8.67-70
+
+instruction :LDRBT # 8.8.71
+
+instruction :LDRD # 8.8.72-74
+
+instruction :LDREX # 8.8.75
+
+instruction :LDREXB # 8.8.76
+
+instruction :LDREXD # 8.8.77
+
+instruction :LDREXH # 8.8.78
 
 instruction :MOV do # 8.8.102-105
   encoding :T1_imm
