@@ -29,6 +29,34 @@ module Indis
       
       alias :pc :r15
       alias :pc= :r15=
+      
+      def initialize
+        16.times { |i| self.send("r#{i}=", "value_r#{i}".to_sym) }
+      end
+      
+      def to_s
+        "#{rval 0}\t#{rval 4}\t#{rval 8}\t#{rval 12}\n" + 
+        "#{rval 1}\t#{rval 5}\t#{rval 9}\t#{rval 13}\n" + 
+        "#{rval 2}\t#{rval 6}\t#{rval 10}\t#{rval 14}\n"+ 
+        "#{rval 3}\t#{rval 7}\t#{rval 11}\t#{rval 15}"
+      end
+      
+      def write_to(regn, val)
+        self.send("#{regn}=", val)
+      end
+      
+      def read(regn)
+        self.send(regn)
+      end
+      
+      private
+      A = [:r0, :r1, :r2, :r3, :r4, :r5, :r6, :r7, :r8, :r9, :r10, :r11, :r12, :sp, :lr, :pc]
+      def rval(r)
+        regn = A[r]
+        val = self.send(regn)
+        val = sprintf("%08x", val) if val.is_a?(Fixnum)
+        "#{sprintf("%3s", regn)}: #{val}"
+      end
     end
   end
 end
