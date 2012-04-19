@@ -25,7 +25,7 @@ describe Indis::ARM::InstructionLoader do
   
   it "should eval process block and set ivars" do
     i = Indis::ARM::PUSHInstruction_A1.new(0, 0xe92d4080)
-    i.regs.should == [:r7, :r14]
+    i.regs.should == [:r7, :lr]
   end
   
   it "should set instruction name" do

@@ -4,7 +4,7 @@ describe Indis::ARM::InstructionHelper do
   it "should decode registers" do
     b = '0000111100000010'.reverse.to_i(2)
     r = Indis::ARM::InstructionHelper.regs_from_bits(b)
-    r.should == [:r4, :r5, :r6, :r7, :r14]
+    r.should == [:r4, :r5, :r6, :r7, :lr]
   end
 end
 

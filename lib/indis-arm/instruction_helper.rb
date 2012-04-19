@@ -120,7 +120,7 @@ module Indis
           bl.length.times do |i| 
             regs << "r#{i}".to_sym if bl[i] == '1'
           end
-          regs
+          regs.map { |r| NAMED_REG[r] || r }
         end
         
         def shift_type_to_s(shift)
