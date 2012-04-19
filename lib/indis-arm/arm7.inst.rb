@@ -174,156 +174,6 @@ instruction :DMB do # 8.8.43
   end
 end
 
-instruction :MOV do # 8.8.102-105
-  encoding :T1_imm
-  encoding :T2_imm
-  encoding :T3_imm
-  encoding :A1_imm do
-    attrs :cond, :Rd, :imm, :setflags
-    bits 'CCCC0011101S0000ddddiiiiiiiiiiii', 'i' => :imm12
-    format value: '#{@Rd}, ##{@imm}'
-    process do |k|
-      raise NotThisInstructionError if k.Rd == 0b1111 && k.setflags == 1 # SUBS PC, LR
-      (@imm, @carry) = h.ARMExpandImm_C(k.imm12.to_boz(12), 0) # TODO: APSR.C ?
-      @imm = @imm.to_i
-    end
-  end
-  encoding :A2_imm do
-    attrs :cond, :Rd, :imm
-    bits 'CCCC00110000jjjjddddiiiiiiiiiiii', 'i' => :imm12, 'j' => :imm4
-    format operator: 'MOVW#{h.cond_to_s(@cond)}',
-           value:    '#{@Rd}, ##{@imm}'
-    process do |k|
-      @imm = h.ZeroExtend(k.imm4.to_boz(4).concat(k.imm12.to_boz(12)), 32).to_i
-      raise UnpredictableError if k.Rd == 15
-    end
-  end
-  encoding :T1_reg
-  encoding :T2_reg
-  encoding :T3_reg
-  encoding :A1_reg do
-    attrs :cond, :Rd, :Rm, :setflags
-    bits 'CCCC0001101S0000dddd00000000mmmm'
-    format value: '#{@Rd}, #{@Rm}'
-    process do |k|
-      raise Indis::ARM::NotThisInstructionError if k.Rd == 0b1111 && k.setflags == 1
-    end
-  end
-end
-
-instruction :MOVT do # 8.8.106
-  encoding :T1
-  encoding :A1 do
-    attrs :cond, :Rd, :imm
-    bits 'CCCC00110100jjjjddddiiiiiiiiiiii', 'i' => :imm12, 'j' => :imm4
-    format value: '#{@Rd}, ##{@imm}'
-    process do |k|
-      @imm = k.imm4.to_boz(4).concat(k.imm12.to_boz(12)).to_i
-      raise UnpredictableError if k.Rd == 15
-    end
-  end
-end
-
-instruction :POP do # 8.8.131-132
-  encoding :T1
-  encoding :T2
-  encoding :T3
-  encoding :A1 do
-    attrs :cond, :regs
-    bits 'CCCC100010111101rrrrrrrrrrrrrrrr', 'r' => :regs_list
-    format value: '{#{h.regs_to_s(@regs)}}'
-    process do |k|
-      @regs = h.regs_from_bits(k.regs_list)
-      raise Indis::ARM::NotThisInstructionError if @regs.length < 2
-      # XXX: UnalignedAllowed = FALSE;
-      raise UnpredictableError if @regs.include?(:sp)
-    end
-  end
-  encoding :A2
-end
-
-instruction :PUSH do # 8.8.133
-  encoding :T1
-  encoding :T2
-  encoding :T3
-  encoding :A1 do
-    attrs :cond, :regs
-    bits 'CCCC100100101101rrrrrrrrrrrrrrrr', 'r' => :regs_list
-    format value: '{#{h.regs_to_s(@regs)}}'
-    process do |k|
-      @regs = h.regs_from_bits(k.regs_list)
-      raise Indis::ARM::NotThisInstructionError if @regs.length < 2
-    end
-  end
-  encoding :A2
-end
-
-instruction :SUB do # 8.8.221-226
-  encoding :T1_imm
-  encoding :T2_imm
-  encoding :T3_imm
-  encoding :T4_imm
-  encoding :A1_imm
-  encoding :T1_reg
-  encoding :T2_reg
-  encoding :A1_reg
-  encoding :A1_rsr
-  encoding :T1_spimm
-  encoding :T2_spimm
-  encoding :T3_spimm
-  encoding :A1_spimm do
-    attrs :cond, :Rd, :imm, :setflags
-    bits 'CCCC0010010S1101ddddiiiiiiiiiiii', 'i' => :imm12
-    format value: '#{@Rd}, sp, ##{@imm}'
-    process do |k|
-      raise Indis::ARM::NotThisInstructionError if k.Rd == 0b1111 && k.setflags == 1
-      @imm = h.ARMExpandImm(k.imm12.to_boz(12)).to_i
-    end
-  end
-  encoding :T1_spreg
-  encoding :A1_spreg
-end
-
-instruction :STR do # 8.8.203-205
-  encoding :T1_imm
-  encoding :T2_imm
-  encoding :T3_imm
-  encoding :T4_imm
-  encoding :A1_imm do
-    attrs :cond, :Rn, :Rt, :imm, :add, :index, :wback
-    bits 'CCCC010PU0W0nnnnttttiiiiiiiiiiii', 'P' => :p, 'U' => :u, 'W' => :w, 'i' => :imm12
-    format value_offset:      '#{@Rt}, [#{@Rn}#{@imm != 0 ? ", ##{@imm}" : ""}]',
-           value_preindexed:  '#{@Rt}, [#{@Rn}, ##{@imm}]!',
-           value_postindexed: '#{@Rt}, [#{@Rn}], ##{@imm}'
-    process do |k|
-      raise Indis::ARM::NotThisInstructionError if k.p == 0 && k.w == 1 # STRT
-      raise Indis::ARM::NotThisInstructionError if k.Rn == 0b1101 && k.p == 1 && k.u == 0 && k.w == 1 && k.imm12 == 0b100 # PUSH
-      @index = k.p == 1
-      @add = k.u == 1
-      if @add
-        @imm = k.imm12 # XXX: zero_expand(32)
-      else
-        @imm = -k.imm12 # XXX: zero_expand(32)
-      end
-      @wback = (k.p == 0 || k.w == 1)
-      raise Indis::ARM::UnpredictableError if @wback && (k.Rn == 15 || k.Rn == k.Rt)
-      
-      if @index && !@wback
-        @value_format = :value_offset
-      elsif @index && @wback
-        @value_format = :value_preindexed
-      elsif !@index && @wback
-        @value_format = :value_postindexed
-      else
-        raise "Unknown format combo"
-      end
-    end
-  end
-  encoding :T1_reg
-  encoding :T2_reg
-  encoding :A1_reg
-end
-
 instruction :LDR do # 8.8.62-66
   encoding :T1_imm
   encoding :T2_imm
@@ -412,4 +262,154 @@ instruction :LDR do # 8.8.62-66
       end
     end
   end
+end
+
+instruction :MOV do # 8.8.102-105
+  encoding :T1_imm
+  encoding :T2_imm
+  encoding :T3_imm
+  encoding :A1_imm do
+    attrs :cond, :Rd, :imm, :setflags
+    bits 'CCCC0011101S0000ddddiiiiiiiiiiii', 'i' => :imm12
+    format value: '#{@Rd}, ##{@imm}'
+    process do |k|
+      raise NotThisInstructionError if k.Rd == 0b1111 && k.setflags == 1 # SUBS PC, LR
+      (@imm, @carry) = h.ARMExpandImm_C(k.imm12.to_boz(12), 0) # TODO: APSR.C ?
+      @imm = @imm.to_i
+    end
+  end
+  encoding :A2_imm do
+    attrs :cond, :Rd, :imm
+    bits 'CCCC00110000jjjjddddiiiiiiiiiiii', 'i' => :imm12, 'j' => :imm4
+    format operator: 'MOVW#{h.cond_to_s(@cond)}',
+           value:    '#{@Rd}, ##{@imm}'
+    process do |k|
+      @imm = h.ZeroExtend(k.imm4.to_boz(4).concat(k.imm12.to_boz(12)), 32).to_i
+      raise UnpredictableError if k.Rd == 15
+    end
+  end
+  encoding :T1_reg
+  encoding :T2_reg
+  encoding :T3_reg
+  encoding :A1_reg do
+    attrs :cond, :Rd, :Rm, :setflags
+    bits 'CCCC0001101S0000dddd00000000mmmm'
+    format value: '#{@Rd}, #{@Rm}'
+    process do |k|
+      raise Indis::ARM::NotThisInstructionError if k.Rd == 0b1111 && k.setflags == 1
+    end
+  end
+end
+
+instruction :MOVT do # 8.8.106
+  encoding :T1
+  encoding :A1 do
+    attrs :cond, :Rd, :imm
+    bits 'CCCC00110100jjjjddddiiiiiiiiiiii', 'i' => :imm12, 'j' => :imm4
+    format value: '#{@Rd}, ##{@imm}'
+    process do |k|
+      @imm = k.imm4.to_boz(4).concat(k.imm12.to_boz(12)).to_i
+      raise UnpredictableError if k.Rd == 15
+    end
+  end
+end
+
+instruction :POP do # 8.8.131-132
+  encoding :T1
+  encoding :T2
+  encoding :T3
+  encoding :A1 do
+    attrs :cond, :regs
+    bits 'CCCC100010111101rrrrrrrrrrrrrrrr', 'r' => :regs_list
+    format value: '{#{h.regs_to_s(@regs)}}'
+    process do |k|
+      @regs = h.regs_from_bits(k.regs_list)
+      raise Indis::ARM::NotThisInstructionError if @regs.length < 2
+      # XXX: UnalignedAllowed = FALSE;
+      raise UnpredictableError if @regs.include?(:sp)
+    end
+  end
+  encoding :A2
+end
+
+instruction :PUSH do # 8.8.133
+  encoding :T1
+  encoding :T2
+  encoding :T3
+  encoding :A1 do
+    attrs :cond, :regs
+    bits 'CCCC100100101101rrrrrrrrrrrrrrrr', 'r' => :regs_list
+    format value: '{#{h.regs_to_s(@regs)}}'
+    process do |k|
+      @regs = h.regs_from_bits(k.regs_list)
+      raise Indis::ARM::NotThisInstructionError if @regs.length < 2
+    end
+  end
+  encoding :A2
+end
+
+instruction :STR do # 8.8.203-205
+  encoding :T1_imm
+  encoding :T2_imm
+  encoding :T3_imm
+  encoding :T4_imm
+  encoding :A1_imm do
+    attrs :cond, :Rn, :Rt, :imm, :add, :index, :wback
+    bits 'CCCC010PU0W0nnnnttttiiiiiiiiiiii', 'P' => :p, 'U' => :u, 'W' => :w, 'i' => :imm12
+    format value_offset:      '#{@Rt}, [#{@Rn}#{@imm != 0 ? ", ##{@imm}" : ""}]',
+           value_preindexed:  '#{@Rt}, [#{@Rn}, ##{@imm}]!',
+           value_postindexed: '#{@Rt}, [#{@Rn}], ##{@imm}'
+    process do |k|
+      raise Indis::ARM::NotThisInstructionError if k.p == 0 && k.w == 1 # STRT
+      raise Indis::ARM::NotThisInstructionError if k.Rn == 0b1101 && k.p == 1 && k.u == 0 && k.w == 1 && k.imm12 == 0b100 # PUSH
+      @index = k.p == 1
+      @add = k.u == 1
+      if @add
+        @imm = k.imm12 # XXX: zero_expand(32)
+      else
+        @imm = -k.imm12 # XXX: zero_expand(32)
+      end
+      @wback = (k.p == 0 || k.w == 1)
+      raise Indis::ARM::UnpredictableError if @wback && (k.Rn == 15 || k.Rn == k.Rt)
+      
+      if @index && !@wback
+        @value_format = :value_offset
+      elsif @index && @wback
+        @value_format = :value_preindexed
+      elsif !@index && @wback
+        @value_format = :value_postindexed
+      else
+        raise "Unknown format combo"
+      end
+    end
+  end
+  encoding :T1_reg
+  encoding :T2_reg
+  encoding :A1_reg
+end
+
+instruction :SUB do # 8.8.221-226
+  encoding :T1_imm
+  encoding :T2_imm
+  encoding :T3_imm
+  encoding :T4_imm
+  encoding :A1_imm
+  encoding :T1_reg
+  encoding :T2_reg
+  encoding :A1_reg
+  encoding :A1_rsr
+  encoding :T1_spimm
+  encoding :T2_spimm
+  encoding :T3_spimm
+  encoding :A1_spimm do
+    attrs :cond, :Rd, :imm, :setflags
+    bits 'CCCC0010010S1101ddddiiiiiiiiiiii', 'i' => :imm12
+    format value: '#{@Rd}, sp, ##{@imm}'
+    process do |k|
+      raise Indis::ARM::NotThisInstructionError if k.Rd == 0b1111 && k.setflags == 1
+      @imm = h.ARMExpandImm(k.imm12.to_boz(12)).to_i
+    end
+  end
+  encoding :T1_spreg
+  encoding :A1_spreg
 end
