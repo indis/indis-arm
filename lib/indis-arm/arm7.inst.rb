@@ -38,13 +38,13 @@ instruction :ADD do # 8.8.4-11
   encoding :T2_reg
   encoding :A1_reg do
     attrs :cond, :Rd, :Rn, :Rm, :imm, :setflags, :imm_shift
-    bits 'CCCC0000100SnnnnddddiiiiiTT0mmmm', 'i' => :imm5, 'T' => :type
+    bits 'CCCC0000100SnnnnddddiiiiiTT0mmmm', 'i' => :imm5, 'T' => :shift_type
     format value: '#{@Rd}, #{@Rn}, #{@Rm}#{@imm > 0 ? ", #{h.shift_type_to_s(@imm_shift)} ##{@imm}" : "" }'
     process do |k|
       # FIXME: mnemonic is wrong?
       raise Indis::ARM::NotThisInstructionError if k.Rd == 0b1111 && k.setflags == 1 # SUBS PC, LR
       raise Indis::ARM::NotThisInstructionError if k.Rn == 0b1101 # ADD:spreg
-      (@imm_shift, @imm) = h.DecodeImmShift(k.type.to_bo, k.imm5.to_bo)
+      (@imm_shift, @imm) = h.DecodeImmShift(k.shift_type.to_bo, k.imm5.to_bo)
       @imm = @imm.to_i
     end
   end
@@ -111,11 +111,11 @@ instruction :BIC do # 8.8.21-23
   encoding :T2_reg
   encoding :A1_reg do
     attrs :cond, :setflags, :Rn, :Rd, :Rm, :imm, :imm_shift
-    bits 'CCCC0001110SnnnnddddiiiiiTT0mmmm', 'i' => :imm5, 'T' => :type
+    bits 'CCCC0001110SnnnnddddiiiiiTT0mmmm', 'i' => :imm5, 'T' => :shift_type
     format value: '#{@Rd}, #{@Rn}, #{@Rm}#{@imm > 0 ? ", #{h.shift_type_to_s(@imm_shift)} ##{@imm}" : "" }'
     process do |k|
       raise Indis::ARM::NotThisInstructionError if k.Rd = 0b1111 && k.setflags == 1 # SUBS PC, LR
-      (@imm_shift, @imm) = h.DecodeImmShift(k.type.to_bo, k.imm5.to_bo)
+      (@imm_shift, @imm) = h.DecodeImmShift(k.shift_type.to_bo, k.imm5.to_bo)
       @imm = @imm.to_i
     end
   end
@@ -298,7 +298,7 @@ instruction :LDR do # 8.8.62-66
   encoding :T2_reg
   encoding :A1_reg do
     attrs :cond, :Rn, :Rt, :Rm, :imm, :add, :index, :wback, :imm_shift
-    bits 'CCCC011PU0W1nnnnttttiiiiiTT0mmmm', 'P' => :p, 'U' => :u, 'W' => :w, 'i' => :imm5, 'T' => :type
+    bits 'CCCC011PU0W1nnnnttttiiiiiTT0mmmm', 'P' => :p, 'U' => :u, 'W' => :w, 'i' => :imm5, 'T' => :shift_type
     format value_offset:      '#{@Rt}, [#{@Rn}, #{@Rm}#{@imm != 0 ? ", ##{@imm}" : ""}]',
            value_preindexed:  '#{@Rt}, [#{@Rn}, #{@Rm}#{@imm != 0 ? ", ##{@imm}" : ""}]!',
            value_postindexed: '#{@Rt}, [#{@Rn}], #{@Rm}#{@imm != 0 ? ", ##{@imm}" : ""}'
@@ -306,7 +306,7 @@ instruction :LDR do # 8.8.62-66
       raise Indis::ARM::NotThisInstructionError if k.p == 0 && k.w == 1 # LDRT
       @index = k.p == 1
       @add = k.u == 1
-      (@imm_shift, @imm) = h.DecodeImmShift(k.type.to_bo, k.imm5.to_bo)
+      (@imm_shift, @imm) = h.DecodeImmShift(k.shift_type.to_bo, k.imm5.to_bo)
       if @add
         @imm = @imm.to_i
       else
