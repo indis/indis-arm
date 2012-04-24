@@ -98,7 +98,7 @@ module Indis
             map[n] = (v & m) >> o
             map
           end
-          OpenStruct.new(map)
+          Struct.new(*(map.keys)).new(*(map.values))
         end
       end
     end
