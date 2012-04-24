@@ -92,19 +92,8 @@ module Indis
         end
         
         def load_instructions
-          masks = {}
-          
-          InstructionLoader.instance.load.each do |klass|
-            m = klass.bits_mask
-            a = masks[m]
-            unless a
-              a = []
-              masks[m] = a
-            end
-            
-            a << klass
-          end
-          
+          masks = Hash.new { |h,k| h[k] = Array.new }
+          InstructionLoader.instance.load.each { |klass| masks[klass.bits_mask] << klass }          
           masks
         end
       end
