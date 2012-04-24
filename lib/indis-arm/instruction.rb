@@ -58,6 +58,17 @@ module Indis
         s
       end
       
+      def to_a
+        s = self.instance_eval "\"#{self.class.formats[:operator]}\""
+        if @value_format
+          fmt = self.class.formats[@value_format]
+          v = self.instance_eval "\"#{fmt}\""
+        else
+          v = self.instance_eval "\"#{self.class.formats[:value]}\"" if self.class.formats[:value]
+        end
+        [s, v]
+      end
+      
       class << self
         attr_reader :name # @return [String] instruction name
         
@@ -101,6 +112,10 @@ module Indis
       
       def to_s
         "UNK\t#{@val.to_s(16).upcase}"
+      end
+      
+      def to_a
+        ['UNK', @val.to_s(16).upcase]
       end
     end
   end
