@@ -70,11 +70,15 @@ module Indis
       private
       def build_instruction(va, bytes)
         CodeParser.instruction_masks.each do |m, arr|
-          instr = arr.find { |i| (bytes & m) == i.bits_match}
+          instr = arr.find { |i| (bytes & m) == i.bits_match }
           begin
             return instr.new(va, bytes) if instr
           rescue NotThisInstructionError
             next
+          rescue UnpredictableError
+            i = UnknownInstruction.new(va, bytes)
+            i.tags[:unpredictable_fail] = "#{instr.name}:#{instr.encoding}"
+            return i
           end
         end
         UnknownInstruction.new(va, bytes)
