@@ -71,12 +71,12 @@ module Indis
         
         # @return [String] instruction mask bits
         def bits_mask
-          @bits.gsub('0', '1').gsub(/[^1]/, '0').to_i(2)
+          @bits_mask ||= @bits.gsub('0', '1').gsub(/[^1]/, '0').to_i(2)
         end
         
         # @return [String] instruction matching bits
         def bits_match
-          @bits.gsub(/[^01]/, '0').to_i(2)
+          @bits_match ||= @bits.gsub(/[^01]/, '0').to_i(2)
         end
         
         # @return [OpenStruct] a map of known fields to instruction value
