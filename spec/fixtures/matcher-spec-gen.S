@@ -5,15 +5,15 @@
 .thumb
 
 lsls r0, r1, #5 // A8.8.94
-//lsls r0, r1, #0 TODO: otool generates assembly, that is inconsistent with UAL
+//lsls r0, r3, #0 // outputs 0018 lsls r0, r3, #0, while mov_reg is expected
 lsls r7, r2, #31
 
 lsrs r0, r1, #5 // A8.8.96
-//lsrs r0, r1, #0 TODO: this one produces lsls o_O
+//lsrs r0, r1, #0 // outputs 0008 lsls r0, r1, #0
 lsrs r7, r2, #31
 
 asrs r0, r1, #5 // A8.8.16
-//asrs r0, r1, #0 TODO: this one produces lsls o_O
+//asrs r0, r1, #0 // outputs 0008 lsls r0, r1, #0
 asrs r7, r2, #31
 
 adds r0, r5, r7 // A8.8.6
@@ -42,5 +42,57 @@ subs r5, #12
 ////
 
 ands r3, r5
+ands r2, r7
 
 eors r6, r0
+eors r1, r4
+
+lsls r4, r6
+lsrs r3, r7
+
+asrs r0, r2
+asrs r1, r5
+
+adcs r4, r7
+adcs r2, r4
+
+sbcs r0, r6
+sbcs r1, r2
+
+rors r7, r3
+rors r2, r6
+
+tst r4, r1
+tst r3, r0
+
+//rsbs r6, r4, #0 // outputs pre-ual 4266 negs r6, r4
+//rsbs r1, r7, #0
+
+cmp r3, r0
+cmp r6, r5
+
+cmn r3, r2
+cmn r6, r1
+
+orrs r4, r2
+orrs r1, r0
+
+//muls r3, r6, r3 // outputs 4373 muls r3, r6
+//muls r2, r0, r2
+
+bics r1, r5
+bics r3, r7
+
+mvns r5, r1
+mvns r6, r2
+
+////
+
+add r9, r10
+add r9, r11
+add r9, r12
+add r9, r13
+add r9, r14
+add r9, r15
+add r10, r3
+add r8, sp
