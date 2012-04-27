@@ -2,8 +2,8 @@ require 'indis-arm/ual_loader'
 
 describe Indis::ARM::UalLoader do
   it "should load instructions" do
-    Indis::ARM::UalLoader.instance.matchers.length.should == 33
-    Indis::ARM::UalLoader.instance.commons.length.should == 16
+    Indis::ARM::UalLoader.instance.matchers.length.should == 35
+    Indis::ARM::UalLoader.instance.commons.length.should == 17
   end
   
   context "thumb parser" do

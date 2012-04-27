@@ -440,9 +440,9 @@ common :add_reg_immed do |instr, bytes, name, regn|
   rd   = (bytes >> 8) & 0b111
   imm8 = bytes        & 0b11111111
   imm32 = h.ZeroExtend(imm8 << 2, 32)
-  instr.values rd: rd, imm8: imm8, imm32: imm32, add: true
+  instr.values rd: rd, imm8: imm8, imm32: imm32, add: true, rn: regn
   instr.mnemonic = name + instr.it_mnemonic
-  instr.operands = "{{rd}}, #{regn}, \#{{imm32}}"
+  instr.operands = '{{rd}}, {{rn}}, #{{imm32}}'
 end
 
 ####
@@ -597,22 +597,43 @@ common :pushpopregs do |instr, bytes|
   registers = (bytes & 0b11111111)
   registers = registers.to_s(2).split('').each_with_index.map { |val,idx| val == "1" ? idx : nil }.compact
   raise UnpredictableError if registers.length < 1
-  instr.values = { registers: registers, unaligned_allowed: false }
+  instr.values = { registers: registers }
 end
 
 matcher :misc => :push do |instr, bytes|
   m = (bytes >> 8) & 0b1
   common :pushpopregs, instr, bytes
   instr.values[:registers] << 14 if m
+  instr.values[:unaligned_allowed] = false
   instr.mnemonic = 'push' + instr.it_mnemonic
-  insr.operands = "{{#{instr.values[:registers].join(', ')}}}"
+  insr.operands = '{{unwind_regs_a:registers}}'
 end
 
 matcher :misc => :pop do |instr, bytes|
   p = (bytes >> 8) & 0b1
   common :pushpopregs, instr, bytes
   instr.values[:registers] << 15 if p
+  instr.values[:unaligned_allowed] = false
   instr.mnemonic = 'push' + instr.it_mnemonic
-  insr.operands = "{{#{instr.values[:registers].join(', ')}}}"
+  insr.operands = '{{unwind_regs_a:registers}}'
   raise UnpredictableError if p == 1 && instr.in_it? && instr.position_in_it != 4
+end
+
+common :stmldm do |instr, bytes, name|
+  rn = (bytes >> 8) & 0b111
+  common :pushpopregs, instr, bytes
+  instr.mnemonic = name + instr.it_mnemonic
+  instr.values[:rn] = rn
+  instr.operands = '{{rn}}!, {{unwind_regs_a:registers}}'
+end
+
+matcher :thumb16 => :stm do |instr, bytes|
+  common :stmldm, instr, bytes, 'stm'
+  instr.values[:wback] = true
+end
+
+matcher :thumb16 => :ldm do |instr, bytes|
+  common :stmldm, instr, bytes, 'stm'
+  wback = instr.values[:registers].include?(instr.values[:rn])
+  instr.operands = '{{rn}}{{iftrue:wback{!,}]}}, {{unwind_regs_a:registers}}'
 end
