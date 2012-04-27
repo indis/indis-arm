@@ -13,7 +13,7 @@ describe Indis::ARM::UalLoader do
       opc.gsub!("\t", " ")
       it "parses 0x#{val.strip} as \"#{opc}\"" do
         i = Indis::ARM::UalLoader.instance.map_instruction(val.to_i(16), :thumb)
-        i.to_s.should == opc
+        i.should decode_to_opcode(opc)
       end
     end
   end
