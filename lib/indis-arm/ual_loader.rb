@@ -25,6 +25,7 @@ module Indis
     class BadMatchError < RuntimeError; end
     
     class Instruction
+      attr_reader :traits
       attr_accessor :size, :mnemonic, :values, :operands, :sets_flags, :it_mnemonic
       
       def initialize
@@ -32,6 +33,7 @@ module Indis
         @values = {}
         @operands = ''
         @it_mnemonic = ''
+        @traits = []
       end
       
       def in_it?
@@ -72,12 +74,14 @@ module Indis
       
       private
       def match(name, instr, bytes)
+        instr.traits << name
         matcher = @matchers[name]
         instance_exec(instr, bytes, &matcher.proc)
       end
       
       def common(*args)
         cname = args.shift
+        args[0].traits << cname
         instance_exec(*args, &@commons[cname])
       end
       
