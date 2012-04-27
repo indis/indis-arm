@@ -34,11 +34,14 @@ module Indis
       attr_reader :traits
       attr_accessor :size, :mnemonic, :values, :operands, :sets_flags
 
-      def initialize
+      def initialize(size, ofs)
+        super(ofs)
+        @size = size
         @mnemonic = ''
         @values = {}
         @operands = ''
         @it_mnemonic = ''
+        @in_it = false
         @traits = []
       end
 

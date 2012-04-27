@@ -59,6 +59,10 @@ matcher :thumb => :thumb16 do |instr, bytes|
   end
 end
 
+common :it_conditional do |instr, bytes| # lazy
+  instr.mnemonic += instr.it_mnemonic
+end
+
 ####
 
 matcher :thumb16 => :shift_add_sub_mov_cmp do |instr, bytes|
@@ -564,8 +568,8 @@ matcher :misc => :bkpt do |instr, bytes|
 end
 
 matcher :misc => :ifthen do |instr, bytes|
-  opA = (bits >> 4) & 0b1111
-  opB = bits        & 0b1111
+  opA = (bytes >> 4) & 0b1111
+  opB = bytes        & 0b1111
   if opB == 0
     names = %w(nop yield wfe wfi sev)
     name = names[opA]
@@ -577,8 +581,8 @@ matcher :misc => :ifthen do |instr, bytes|
 end
 
 matcher :ifthen => :it do |instr, bytes|
-  first_cond = (bits >> 4) & 0b1111
-  mask       = bits        & 0b1111
+  first_cond = (bytes >> 4) & 0b1111
+  mask       = bytes        & 0b1111
   raise BadMatchError if mask == 0
   raise UnpredictableError if first_cond == 0b1111 || (first_cond == 0b1110 && mask.bit_count != 1) # FIXME implement
   raise UnpredictableError if instr.in_it?
@@ -603,12 +607,14 @@ matcher :ifthen => :it do |instr, bytes|
       conditions << first_cond
     else
       xyz << 'e'
-      conditions << first_cond ^ 0b1
+      conditions << (first_cond ^ 0b1)
     end
   end
   
+  conditions = conditions.map { |cond| h.cond_to_mnemonic(cond) }
+  
   instr.mnemonic = 'it' + xyz.join('')
-  instr.values = { first_cond: cond, conditions: conditions }
+  instr.values = { first_cond: h.cond_to_mnemonic(first_cond), conditions: conditions }
   instr.operands = '{{first_cond}}'
 end
 

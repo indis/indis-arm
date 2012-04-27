@@ -16,14 +16,19 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.    #
 ##############################################################################
 
+require 'indis-arm/instruction'
+require 'indis-arm/ual_loader'
+
 module Indis
   module ARM
     
-    module ThumbIt
-      attr_accessor :it_mnemonic, :in_it
+    class InstructionResolver
+      def initialize(args)
+        
+      end
       
-      def in_it?
-        @in_it
+      def resolve(bytes)
+        
       end
     end
     

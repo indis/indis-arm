@@ -1,0 +1,14 @@
+00000000	    bf18	it	ne
+00000002	    4611	movne	r1, r2
+00000004	    bfc4	itt	gt
+00000006	    4611	movgt	r1, r2
+00000008	    4634	movgt	r4, r6
+0000000a	    bf6c	ite	vs
+0000000c	    4611	movvs	r1, r2
+0000000e	    4607	movvc	r7, r0
+00000010	    bf95	itete	ls
+00000012	    4608	movls	r0, r1
+00000014	    461a	movhi	r2, r3
+00000016	    462c	movls	r4, r5
+00000018	    463e	movhi	r6, r7
+0000001a	    4638	mov	r0, r7

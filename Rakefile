@@ -14,6 +14,12 @@ file 'spec/fixtures/matcher-spec-gen.txt' => ['spec/fixtures/matcher-spec-gen.S'
   FileUtils.rm_f('spec/fixtures/matcher-spec-gen.o')
 end
 
-task :fixtures => 'spec/fixtures/matcher-spec-gen.txt'
+file 'spec/fixtures/matcher-spec-it-gen.txt' => ['spec/fixtures/matcher-spec-it-gen.S'] do
+  sh "#{LLVM_GCC} -mthumb -c spec/fixtures/matcher-spec-it-gen.S -o spec/fixtures/matcher-spec-it-gen.o"
+  sh "otool -tvVB spec/fixtures/matcher-spec-it-gen.o | grep -E '^0' > spec/fixtures/matcher-spec-it-gen.txt"
+  FileUtils.rm_f('spec/fixtures/matcher-spec-it-gen.o')
+end
+
+task :fixtures => ['spec/fixtures/matcher-spec-gen.txt', 'spec/fixtures/matcher-spec-it-gen.txt']
 
 task :default => :spec

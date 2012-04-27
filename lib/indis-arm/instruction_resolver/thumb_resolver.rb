@@ -16,14 +16,48 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.    #
 ##############################################################################
 
+require 'indis-arm/instruction'
+require 'indis-arm/ual_loader'
+
 module Indis
   module ARM
     
-    module ThumbIt
-      attr_accessor :it_mnemonic, :in_it
+    class ThumbResolver
+      def initialize
+        @it_conditions = []
+      end
       
-      def in_it?
-        @in_it
+      def resolve(io, vmbase)
+        loader = UalLoader.instance
+        
+        bytes = io.read(2).unpack('v')[0]
+        begin
+          opcode = bytes >> 11
+          if opcode == 0b11101 || opcode == 0b11110 || opcode == 0b11111
+            bytes = (bytes << 16) + io.read(2).unpack('v')[0]
+            
+            
+            vmbase += 2
+          else
+            instr = Instruction.new(2, vmbase)
+            if @it_conditions.length > 0
+              instr.it_mnemonic = @it_conditions.shift
+              instr.in_it = true
+            end
+            
+            loader.map_instruction(instr, bytes, :thumb16)
+            if instr.traits.include?(:it)
+              @it_conditions = instr.values[:conditions]
+            end
+            
+            yield instr
+            
+            vmbase += 2
+          end
+          
+          bytes = io.read(2)
+          bytes = bytes.unpack('v')[0] if bytes
+        end while bytes
       end
     end
     

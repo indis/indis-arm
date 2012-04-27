@@ -42,6 +42,12 @@ module Indis
           imm == 0 ? [:rrx, 1] : [:ror, imm]
         end    
       end
+      
+      def cond_to_mnemonic(cond)
+        return '' unless cond
+        mnem = ['eq', 'ne', 'cs', 'cc', 'mi', 'pl', 'vs', 'vc', 'hi', 'ls', 'ge', 'lt', 'gt', 'le', '']
+        mnem[cond]
+      end
     end
     
     module PseudoCodeInstructionHelper

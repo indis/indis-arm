@@ -35,8 +35,7 @@ module Indis
         load_ual
       end
       
-      def map_instruction(bytes, root)
-        instr = Instruction.new
+      def map_instruction(instr, bytes, root)
         match(root, instr, bytes)
         instr
       end
