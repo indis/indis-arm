@@ -310,13 +310,17 @@ matcher :spec_data_bx => :add do |instr, bytes|
   rdn = bytes        & 0b111
   d   = (dn << 3) + rdn
   
-  raise BadMatchError if d == 0b1101 || rm == 0b1101 # SEE ADD (SP plus register)
+  match :add_sp, instr, bytes if d == 0b1101 || rm == 0b1101 # SEE ADD (SP plus register)
   raise UnpredictableError if d == 15 && rm == 15
   raise UnpredictableError if d == 15 && instr.in_it? && instr.position_in_it != 4
   instr.mnemonic = 'add' + instr.it_mnemonic
   instr.values = { rd: d, rn: d, rdn: d, rm: rm, shift_t: :lsl, shift_n: 0 }
   instr.operands = '{{rdn}}, {{rm}}'
   instr.sets_flags = false
+end
+
+matcher :add => :add_sp do |instr, bytes|
+  # TODO: implement?
 end
 
 matcher :spec_data_bx => :cmp do |instr, bytes|
