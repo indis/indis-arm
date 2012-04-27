@@ -19,6 +19,7 @@
 require 'singleton'
 require 'indis-core/binaryops_string'
 require 'indis-arm/instruction'
+require 'indis-arm/instruction_helper'
 
 module Indis
   module ARM
@@ -63,26 +64,6 @@ module Indis
       
       def h
         @instructions_helper ||= UalInstructionsHelper.new
-      end
-    end
-    
-    class UalInstructionsHelper
-      def ZeroExtend(bits_x, i)
-        bits_x.to_bo.zero_extend(i).to_i
-      end
-      
-      def DecodeImmShift(bits2_type, bits5_imm5)
-        imm = bits5_imm5.to_i
-        case bits2_type.to_i
-        when 0b00
-          [:lsl, imm]
-        when 0b01
-          [:lsr, imm == 0 ? 32 : imm]
-        when 0b10
-          [:asr, imm == 0 ? 32 : imm]
-        when 0b11
-          imm == 0 ? [:rrx, 1] : [:ror, imm]
-        end    
       end
     end
     

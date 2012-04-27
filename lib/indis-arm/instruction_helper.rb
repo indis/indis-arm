@@ -20,6 +20,26 @@ require 'indis-core/binaryops_string'
 
 module Indis
   module ARM
+    class UalInstructionsHelper
+      def ZeroExtend(bits_x, i)
+        bits_x.to_bo.zero_extend(i).to_i
+      end
+      
+      def DecodeImmShift(bits2_type, bits5_imm5)
+        imm = bits5_imm5.to_i
+        case bits2_type.to_i
+        when 0b00
+          [:lsl, imm]
+        when 0b01
+          [:lsr, imm == 0 ? 32 : imm]
+        when 0b10
+          [:asr, imm == 0 ? 32 : imm]
+        when 0b11
+          imm == 0 ? [:rrx, 1] : [:ror, imm]
+        end    
+      end
+    end
+    
     module PseudoCodeInstructionHelper
       def ARMExpandImm(bits_imm12) # A5.2.4
         ARMExpandImm_C(bits_imm12, 0)[0] # FIXME APSR.C ???
