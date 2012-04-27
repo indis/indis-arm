@@ -314,8 +314,8 @@ matcher :spec_data_bx => :add do |instr, bytes|
   raise UnpredictableError if d == 15 && rm == 15
   raise UnpredictableError if d == 15 && instr.in_it? && instr.position_in_it != 4
   instr.mnemonic = 'add' + instr.it_mnemonic
-  instr.values = { rd: d, rn: d, rm: rm, shift_t: :lsl, shift_n: 0 }
-  inst.operands = '{{rdn}}, {{rm}}'
+  instr.values = { rd: d, rn: d, rdn: d, rm: rm, shift_t: :lsl, shift_n: 0 }
+  instr.operands = '{{rdn}}, {{rm}}'
   instr.sets_flags = false
 end
 
