@@ -45,11 +45,23 @@
 00000058	    43bb	bics	r3, r7
 0000005a	    43cd	mvns	r5, r1
 0000005c	    43d6	mvns	r6, r2
-0000005e	    44d1	add	r9, sl
-00000060	    44d9	add	r9, fp
-00000062	    44e1	add	r9, ip
-00000064	    44e9	add	r9, sp
-00000066	    44f1	add	r9, lr
-00000068	    44f9	add	r9, pc
-0000006a	    449a	add	sl, r3
-0000006c	    44e8	add	r8, sp
+0000005e	    18d1	adds	r1, r2, r3
+00000060	    19ac	adds	r4, r5, r6
+00000062	    44d1	add	r9, sl
+00000064	    44d9	add	r9, fp
+00000066	    44e1	add	r9, ip
+00000068	    44e9	add	r9, sp
+0000006a	    44f1	add	r9, lr
+0000006c	    44f9	add	r9, pc
+0000006e	    449a	add	sl, r3
+00000070	    44e8	add	r8, sp
+00000072	    45fb	cmp	fp, pc
+00000074	    45d1	cmp	r9, sl
+00000076	    1c11	adds	r1, r2, #0
+00000078	    1c37	adds	r7, r6, #0
+0000007a	    46f7	mov	pc, lr
+0000007c	    466b	mov	r3, sp
+0000007e	    4770	bx	lr
+00000080	    4718	bx	r3
+00000082	    47f0	blx	lr
+00000084	    47a8	blx	r5

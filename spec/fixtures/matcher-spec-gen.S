@@ -87,6 +87,8 @@ mvns r5, r1
 mvns r6, r2
 
 ////
+adds r1, r2, r3
+adds r4, r5, r6
 
 add r9, r10
 add r9, r11
@@ -96,3 +98,29 @@ add r9, r14
 add r9, r15
 add r10, r3
 add r8, sp
+
+cmp r11, r15
+cmp r9, r10
+
+movs r1, r2
+movs r7, r6
+
+mov pc, lr
+mov r3, sp
+
+bx lr
+bx r3
+
+blx lr
+blx r5
+
+////
+
+//ldr r3, L0 // 4b01 ldr r3, [pc, #4]	(0x8c)
+//mov pc, lr
+//mov r1, r2
+//L0:
+//.long 256
+
+////
+

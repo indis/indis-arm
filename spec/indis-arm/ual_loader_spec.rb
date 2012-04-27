@@ -30,6 +30,8 @@ describe Indis::ARM::UalLoader do
       
       0x4373 => 'muls r3, r6, r3',
       0x4342 => 'muls r2, r0, r2',
+      
+      0x4b01 => 'ldr r3, [pc, #4]',
     }
     
     special_cases.each do |val, opc|

@@ -377,7 +377,7 @@ end
 matcher :thumb16 => :ldr_literal do |instr, bytes|
   rt   = (bytes >> 8) & 0b111
   imm8 = bytes & 0b11111111
-  imm32 = h.ZeroExtend(imm8 << 2)
+  imm32 = h.ZeroExtend(imm8 << 2, 32)
   instr.mnemonic = 'ldr' + instr.it_mnemonic
   instr.values = { rt: rt, imm8: imm8, imm32: imm32, add: true }
   instr.operands = '{{rt}}, [pc, #{{imm32}}]'
