@@ -107,7 +107,7 @@ module Indis
     end
     
     class UalInstructionsHelper
-      def ZeroExtend(bits_x, i) # P5.3
+      def ZeroExtend(bits_x, i)
         bits_x.to_bo.zero_extend(i).to_i
       end
       
