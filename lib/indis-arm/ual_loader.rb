@@ -43,7 +43,13 @@ module Indis
       def operands_subst
         o = @operands.dup
         while o.index('{')
-          o.gsub!(/{{[^}]+}}/) { |mstr| self.values[mstr[2...-2].to_sym] }
+          o.gsub!(/{{[^}]+}}/) do |mstr|
+            if mstr[2] == 'r'
+              register_to_s(self.values[mstr[2...-2].to_sym])
+            else
+              self.values[mstr[2...-2].to_sym]
+            end
+          end
         end
         o
       end
@@ -52,8 +58,10 @@ module Indis
         "#{@mnemonic} #{operands_subst}"
       end
       
-      def values
-        @values.each_with_object({}) { |(k, v), h| h[k] = (k.to_s[0] == 'r' ? "r#{v}" : v) }
+      private
+      def register_to_s(regn)
+        names = %w(r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 sl fp ip sp lr pc)
+        names[regn]
       end
     end
     
