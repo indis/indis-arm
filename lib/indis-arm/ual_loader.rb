@@ -18,52 +18,12 @@
 
 require 'singleton'
 require 'indis-core/binaryops_string'
+require 'indis-arm/instruction'
 
 module Indis
   module ARM
     
     class BadMatchError < RuntimeError; end
-    
-    class Instruction
-      attr_reader :traits
-      attr_accessor :size, :mnemonic, :values, :operands, :sets_flags, :it_mnemonic
-      
-      def initialize
-        @mnemonic = ''
-        @values = {}
-        @operands = ''
-        @it_mnemonic = ''
-        @traits = []
-      end
-      
-      def in_it?
-        false
-      end
-      
-      def operands_subst
-        o = @operands.dup
-        while o.index('{')
-          o.gsub!(/{{[^}]+}}/) do |mstr|
-            if mstr[2] == 'r'
-              register_to_s(self.values[mstr[2...-2].to_sym])
-            else
-              self.values[mstr[2...-2].to_sym]
-            end
-          end
-        end
-        o
-      end
-      
-      def to_s
-        "#{@mnemonic} #{operands_subst}"
-      end
-      
-      private
-      def register_to_s(regn)
-        names = %w(r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 sl fp ip sp lr pc)
-        names[regn]
-      end
-    end
     
     class UalLoader
       include Singleton

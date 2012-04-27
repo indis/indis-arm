@@ -16,65 +16,16 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.    #
 ##############################################################################
 
-require 'ostruct'
-require 'indis-arm/instruction_helper'
-require 'indis-arm/instruction/thumb_it'
-require 'indis-arm/instruction/format_helper'
-require 'indis-core/entity'
-
 module Indis
   module ARM
     
-    # ARM::Instruction is a code {Indis::Entity entity} that represens an ARM
-    # instruction
-    class Instruction < Indis::Entity
-      include ThumbIt
-      include FormatHelper
-      
-      attr_reader :traits
-      attr_accessor :size, :mnemonic, :values, :operands, :sets_flags
-
-      def initialize
-        @mnemonic = ''
-        @values = {}
-        @operands = ''
-        @it_mnemonic = ''
-        @traits = []
-      end
-
-      def operands_subst
-        o = @operands.dup
-        while o.index('{')
-          o.gsub!(/{{[^}]+}}/) do |mstr|
-            if mstr[2] == 'r'
-              register_to_s(self.values[mstr[2...-2].to_sym])
-            else
-              self.values[mstr[2...-2].to_sym]
-            end
-          end
-        end
-        o
-      end
-
-      def to_s
-        "#{@mnemonic} #{operands_subst}"
+    module FormatHelper
+      private
+      def register_to_s(regn)
+        names = %w(r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 sl fp ip sp lr pc)
+        names[regn]
       end
     end
     
-    # UnknownInstruction represents an unknown (not yet mapped in DSL) instruction
-    class UnknownInstruction < Instruction
-      def initialize(vmaddr, bytes)
-        super
-        @val = bytes
-      end
-      
-      def to_s
-        "UNK\t#{@val.to_s(16).upcase}"
-      end
-      
-      def to_a
-        ['UNK', @val.to_s(16).upcase]
-      end
-    end
   end
 end
