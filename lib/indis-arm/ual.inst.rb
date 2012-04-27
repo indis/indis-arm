@@ -585,11 +585,30 @@ matcher :ifthen => :it do |instr, bytes|
   
   first_cond_0 = first_cond & 0b1
   conditions = [first_cond]
+  cond_count = 1
   xyz = []
-  # FIXME implement (A8-389, A8.8.54)
+  
+  if mask & 0b111 == 0b100
+    cond_count = 2
+  elsif mask & 0b11 == 0b10
+    cond_count = 3
+  elsif mask & 0b1 == 0b1
+    cond_count = 4
+  end
+  
+  (cond_count-1).times do |i|
+    mask_bit = (mask >> (3-i)) & 0b1
+    if mask_bit == first_cond_0
+      xyz << 't'
+      conditions << first_cond
+    else
+      xyz << 'e'
+      conditions << first_cond ^ 0b1
+    end
+  end
   
   instr.mnemonic = 'it' + xyz.join('')
-  instr.values = { first_cond: cond }
+  instr.values = { first_cond: cond, conditions: conditions }
   instr.operands = '{{first_cond}}'
 end
 
@@ -636,4 +655,58 @@ matcher :thumb16 => :ldm do |instr, bytes|
   common :stmldm, instr, bytes, 'stm'
   wback = instr.values[:registers].include?(instr.values[:rn])
   instr.operands = '{{rn}}{{iftrue:wback{!,}]}}, {{unwind_regs_a:registers}}'
+end
+
+matcher :thumb16 => :b_svc do |instr, bytes|
+  opcode4 = (bytes >> 8) & 0b1111
+  opcode3 = opcode4 >> 1
+  if opcode3 == 0b111
+    if opcode4 & 0b1 == 1
+      match :svc, instr, bytes
+    else
+      match :undef, instr, bytes
+    end
+  else
+    match :cond_b, instr, bytes
+  end
+end
+
+common :imm8_only_zeroexpand do |instr, bytes|
+  imm8 = bytes & 0b11111111
+  imm32 = h.ZeroExtend(imm8, 32)
+  instr.values = { imm8: imm8, imm32: imm32 }
+  instr.operands = '#{{imm32}}'
+end
+
+matcher :b_svc => :svc do |instr, bytes|
+  common :imm8_only_zeroexpand
+  instr.mnemonic = 'svc' + instr.it_mnemonic
+end
+
+matcher :b_svc => :undef do |instr, bytes|
+  common :imm8_only_zeroexpand
+  instr.mnemonic = 'udf' + instr.it_mnemonic
+end
+
+matcher :b_svc => :cond_b do |instr, bytes|
+  cond = (bytes >> 8) & 0b1111
+  imm8 = bytes & 0b11111111
+  imm32 = h.SignExtend(imm8 << 1, 32)
+  
+  raise UnpredictableError if instr.in_it?
+  
+  instr.mnemonic = 'b' + h.cond_to_mnemonic(cond)
+  instr.values = { imm8: imm8, imm32: imm32 }
+  instr.operands = '{{imm32}}'
+end
+
+matcher :thumb16 => :b do |instr, bytes|
+  imm11 = bytes & 0b11111111111
+  imm32 = h.SignExtend(imm11 << 1, 32)
+  
+  raise UnpredictableError if instr.in_it? && instr.position_in_it != 4
+  
+  instr.mnemonic = 'b' + instr.it_mnemonic
+  instr.values = { imm11: imm11, imm32: imm32 }
+  instr.operands = '{{imm32}}'
 end

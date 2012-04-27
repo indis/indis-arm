@@ -2,8 +2,8 @@ require 'indis-arm/ual_loader'
 
 describe Indis::ARM::UalLoader do
   it "should load instructions" do
-    Indis::ARM::UalLoader.instance.matchers.length.should == 35
-    Indis::ARM::UalLoader.instance.commons.length.should == 17
+    Indis::ARM::UalLoader.instance.matchers.length.should == 40
+    Indis::ARM::UalLoader.instance.commons.length.should == 18
   end
   
   context "thumb parser" do
@@ -32,6 +32,10 @@ describe Indis::ARM::UalLoader do
       0x4342 => 'muls r2, r0, r2',
       
       0x4b01 => 'ldr r3, [pc, #4]',
+      
+      
+      
+      0xe7fa => 'b -12',
     }
     
     special_cases.each do |val, opc|

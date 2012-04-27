@@ -107,7 +107,7 @@ movs r7, r6
 
 mov pc, lr
 mov r3, sp
-
+L0:
 bx lr
 bx r3
 
@@ -124,3 +124,4 @@ blx r5
 
 ////
 
+//b L0 // e7fa b.n 0x7e

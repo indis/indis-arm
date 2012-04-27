@@ -25,6 +25,10 @@ module Indis
         bits_x.to_bo.zero_extend(i).to_i
       end
       
+      def SignExtend(bits_x, i)
+        bits_x.to_bo.sign_extend(i).to_signed_i
+      end
+      
       def DecodeImmShift(bits2_type, bits5_imm5)
         imm = bits5_imm5.to_i
         case bits2_type.to_i
