@@ -675,16 +675,16 @@ common :imm8_only_zeroexpand do |instr, bytes|
   imm8 = bytes & 0b11111111
   imm32 = h.ZeroExtend(imm8, 32)
   instr.values = { imm8: imm8, imm32: imm32 }
-  instr.operands = '#{{imm32}}'
+  instr.operands = '{{imm32}}'
 end
 
 matcher :b_svc => :svc do |instr, bytes|
-  common :imm8_only_zeroexpand
+  common :imm8_only_zeroexpand, instr, bytes
   instr.mnemonic = 'svc' + instr.it_mnemonic
 end
 
 matcher :b_svc => :undef do |instr, bytes|
-  common :imm8_only_zeroexpand
+  common :imm8_only_zeroexpand, instr, bytes
   instr.mnemonic = 'udf' + instr.it_mnemonic
 end
 

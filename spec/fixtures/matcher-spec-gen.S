@@ -4,6 +4,8 @@
 .syntax unified
 .thumb
 
+//// Shift (immediate), add, subtract, move, and compare on page A6-222
+
 lsls r0, r1, #5 // A8.8.94
 //lsls r0, r3, #0 // outputs 0018 lsls r0, r3, #0, while mov_reg is expected
 lsls r7, r2, #31
@@ -39,7 +41,7 @@ adds r5, #13
 subs r5, #100 // A8.8.221
 subs r5, #12
 
-////
+//// Data-processing on page A6-223
 
 ands r3, r5
 ands r2, r7
@@ -86,7 +88,8 @@ bics r3, r7
 mvns r5, r1
 mvns r6, r2
 
-////
+//// Special data instructions and branch and exchange on page A6-224
+
 adds r1, r2, r3
 adds r4, r5, r6
 
@@ -114,7 +117,7 @@ bx r3
 blx lr
 blx r5
 
-////
+//// Load from Literal Pool, see LDR (literal) on page A8-408
 
 //ldr r3, L0 // 4b01 ldr r3, [pc, #4]	(0x8c)
 //mov pc, lr
@@ -122,7 +125,25 @@ blx r5
 //L0:
 //.long 256
 
-////
+//// Load/store single data item on page A6-225
+
+// TODO
+
+//// Generate PC-relative address, see ADR on page A8-320
+
+// TODO
+
+//// Generate SP-relative address, see ADD (SP plus immediate) on page A8-314
+
+// TODO
+
+//// Miscellaneous 16-bit instructions on page A6-226
+
+//// Store multiple registers, see STM (STMIA, STMEA) on page A8-662
+
+//// Load multiple registers, see LDM/LDMIA/LDMFD (Thumb) on page A8-394
+
+//// Conditional branch, and Supervisor Call on page A6-227
 
 //b L0 // e7fa b.n 0x7e
 
@@ -131,3 +152,7 @@ blx r5
 
 svc 215
 svc 12
+
+//// Unconditional Branch, see B on page A8-332
+
+
