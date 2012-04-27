@@ -44,8 +44,7 @@ matcher :thumb => :thumb16 do |instr, bytes|
       else
         opcode3 = opcode4 >> 1
         case opcode3
-        when 0b011
-        when 0b100
+        when 0b011, 0b100
           match :ldr_single, instr, bytes
         else
           opcode2 = opcode3 >> 1
@@ -287,27 +286,19 @@ matcher :thumb16 => :spec_data_bx do |instr, bytes|
   case opcode4
   when 0b0000
     match :add, instr, bytes # low
-  when 0b0001
-  when 0b0010
-  when 0b0011
+  when 0b0001, 0b0010, 0b0011
     match :add, instr, bytes # high
   when 0b0100
     raise UnpredictableError
-  when 0b0101
-  when 0b0110
-  when 0b0111
+  when 0b0101, 0b0110, 0b0111
     match :cmp, instr, bytes
   when 0b1000
     match :mov, instr, bytes # low
-  when 0b1001
-  when 0b1010
-  when 0b1011
+  when 0b1001, 0b1010, 0b1011
     match :mov, instr, bytes # high
-  when 0b1100
-  when 0b1101
+  when 0b1100, 0b1101
     common :bx_blx, instr, bytes, 'bx'
-  when 0b1110
-  when 0b1111
+  when 0b1110, 0b1111
     common :bx_blx, instr, bytes, 'blx'
     raise UnpredictableError if instr.values[:rm] == 15
   end
@@ -473,10 +464,7 @@ matcher :thumb16 => :misc do |instr, bytes|
         else
           opcode4 = opcode5 >> 1
           case opcode4
-          when 0b0001
-          when 0b0011
-          when 0b1001
-          when 0b1011
+          when 0b0001, 0b0011, 0b1001, 0b1011
             match :cbz_cbnz, instr, bytes
           when 0b1110
             match :bkpt, instr, bytes
