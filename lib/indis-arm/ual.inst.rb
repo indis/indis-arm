@@ -128,8 +128,21 @@ common :shift_imm5 do |instr, bytes, name, decode_shift|
 end
 
 matcher :shift_add_sub_mov_cmp => :lsl_imm do |instr, bytes|
-  common :shift_imm5, instr, bytes, 'lsl', '00'
-  raise BadMatchError if instr.values[:imm5] == 0
+  imm5 = (bytes >> 6) & 0b11111
+  if imm5 == 0
+    match :movs, instr, bytes
+  else
+    common :shift_imm5, instr, bytes, 'lsl', '00'
+  end
+end
+
+matcher :lsl_imm => :movs do |instr, bytes|
+  rd   = bytes        & 0b111
+  rm   = (bytes >> 3) & 0b111
+  raise UnpredictableError if instr.in_it?
+  instr.mnemonic = 'movs'
+  instr.values = { rd: rd, rm: rm }
+  instr.operands = '{{rd}}, {{rm}}'
 end
 
 common :Rm_Rn_Rd do |instr, bytes|
