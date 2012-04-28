@@ -127,7 +127,14 @@ blx r5
 
 //// Load/store single data item on page A6-225
 
-// TODO
+str r0, [r1, r2]
+strh r3, [r4, r5]
+strb r6, [r7, r0]
+ldrsb r1, [r2, r3]
+ldr r4, [r5, r6]
+ldrh r7, [r0, r1]
+ldrb r2, [r3, r4]
+ldrsh r5, [r6, r7]
 
 //// Generate PC-relative address, see ADR on page A8-320
 
