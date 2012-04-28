@@ -396,7 +396,7 @@ matcher :thumb16 => :ldr_single do |instr, bytes|
   case opA
   when 0b0101
     names = %w(str strh strb ldrsb ldr ldrh ldrb ldrsh)
-    common :Rm_Rn_Rt_data_load, instr, bytes, names[opB]
+    common :Rm_Rn_Rt_data_load, instr, bytes, names[opB3]
   when 0b0110
     common :imm5_Rn_Rt_data_load, instr, bytes, (opB1 == 0 ? 'str' : 'ldr'), 2
   when 0b0111
