@@ -12,7 +12,7 @@ describe Indis::ARM::UalLoader do
     fixtures.each do |(adr, val, opc)|
       opc.gsub!("\t", " ")
       it "parses 0x#{val.strip} as \"#{opc}\"" do
-        i = Indis::ARM::UalLoader.instance.map_instruction(val.to_i(16), :thumb)
+        i = Indis::ARM::UalLoader.instance.map_instruction(Indis::ARM::Instruction.new(2, 0), val.to_i(16), :thumb16)
         i.should decode_to_opcode(opc)
       end
     end
@@ -40,7 +40,7 @@ describe Indis::ARM::UalLoader do
     
     special_cases.each do |val, opc|
       it "parses 0x#{val.to_s 16} as \"#{opc}\"" do
-        i = Indis::ARM::UalLoader.instance.map_instruction(val, :thumb)
+        i = Indis::ARM::UalLoader.instance.map_instruction(Indis::ARM::Instruction.new(2, 0), val, :thumb16)
         i.should decode_to_opcode(opc)
       end
     end
