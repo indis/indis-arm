@@ -49,7 +49,7 @@ module Indis
       
       def operands_subst
         o = @operands.dup
-        while o.index('{')
+        while o.index('{{')
           o.gsub!(/{{[^}]+}}/) do |mstr|
             argn = mstr[2...-2]
             process_formatter(argn)
