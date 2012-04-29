@@ -514,10 +514,10 @@ matcher :misc => :setend do |instr, bytes|
 end
 
 matcher :misc => :cps do |instr, bytes|
-  im = (bits >> 4) & 0b1
-  a  = (bits >> 2) & 0b1
-  i  = (bits >> 1) & 0b1
-  f  = bits        & 0b1
+  im = (bytes >> 4) & 0b1
+  a  = (bytes >> 2) & 0b1
+  i  = (bytes >> 1) & 0b1
+  f  = bytes        & 0b1
   
   raise UnpredictableError if a+i+f == 0
   enable = im == 0

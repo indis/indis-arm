@@ -90,5 +90,7 @@
 000000b2	    b4f8	push	{r3, r4, r5, r6, r7}
 000000b4	    b658	setend	be
 000000b6	    b650	setend	le
-000000b8	    dfd7	svc	215
-000000ba	    df0c	svc	12
+000000b8	    b664	cpsie	a
+000000ba	    b673	cpsid	if
+000000bc	    dfd7	svc	215
+000000be	    df0c	svc	12

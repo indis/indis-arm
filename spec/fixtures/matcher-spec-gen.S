@@ -166,6 +166,8 @@ push {r1, r2, r3, lr}
 push {r3-r7}
 setend be
 setend le
+cpsie a
+cpsid if
 
 //// Store multiple registers, see STM (STMIA, STMEA) on page A8-662
 
