@@ -42,6 +42,9 @@ module Indis
           @vmaddr + 4 + processed_val
         when :hex
           '0x' + processed_val.to_s(16)
+        when :unwind_regs_a
+          rr = processed_val.map { |r| register_to_s(r) }.join(', ')
+          "{#{rr}}"
         else
           raise RuntimeError, "Unknown formatter #{fmt} for #{val}, with traits #{@traits}"
         end

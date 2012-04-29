@@ -82,5 +82,11 @@
 000000a2	    94ff	str	r4, [sp, #1020]
 000000a4	    9d37	ldr	r5, [sp, #220]
 000000a6	    a8ff	add	r0, sp, #1020
-000000a8	    dfd7	svc	215
-000000aa	    df0c	svc	12
+000000a8	    b223	sxth	r3, r4
+000000aa	    b275	sxtb	r5, r6
+000000ac	    b287	uxth	r7, r0
+000000ae	    b2d1	uxtb	r1, r2
+000000b0	    b50e	push	{r1, r2, r3, lr}
+000000b2	    b4f8	push	{r3, r4, r5, r6, r7}
+000000b4	    dfd7	svc	215
+000000b6	    df0c	svc	12

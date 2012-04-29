@@ -158,8 +158,16 @@ add r0, sp, 1020
 //sub sp, sp, 100
 //cbz r1, L1 // integration test, outputs b109 cbz r1, 0xb2
 //cbnz r2, L1
+sxth r3, r4
+sxtb r5, r6
+uxth r7, r0
+uxtb r1, r2
+push {r1, r2, r3, lr}
+push {r3-r7}
 
 //// Store multiple registers, see STM (STMIA, STMEA) on page A8-662
+
+
 
 //// Load multiple registers, see LDM/LDMIA/LDMFD (Thumb) on page A8-394
 
@@ -171,7 +179,6 @@ add r0, sp, 1020
 // udf 250
 
 svc 215
-L1:
 svc 12
 
 //// Unconditional Branch, see B on page A8-332

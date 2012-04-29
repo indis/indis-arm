@@ -620,7 +620,7 @@ end
 
 common :pushpopregs do |instr, bytes|
   registers = (bytes & 0b11111111)
-  registers = registers.to_s(2).split('').each_with_index.map { |val,idx| val == "1" ? idx : nil }.compact
+  registers = registers.to_s(2).reverse!.split('').each_with_index.map { |val,idx| val == "1" ? idx : nil }.compact
   raise UnpredictableError if registers.length < 1
   instr.values = { registers: registers }
 end
@@ -628,16 +628,16 @@ end
 matcher :misc => :push do |instr, bytes|
   m = (bytes >> 8) & 0b1
   common :pushpopregs, instr, bytes
-  instr.values[:registers] << 14 if m
+  instr.values[:registers] << 14 if m == 1
   instr.values[:unaligned_allowed] = false
   instr.mnemonic = 'push' + instr.it_mnemonic
-  insr.operands = '{{unwind_regs_a:registers}}'
+  instr.operands = '{{unwind_regs_a:registers}}'
 end
 
 matcher :misc => :pop do |instr, bytes|
   p = (bytes >> 8) & 0b1
   common :pushpopregs, instr, bytes
-  instr.values[:registers] << 15 if p
+  instr.values[:registers] << 15 if p == 1
   instr.values[:unaligned_allowed] = false
   instr.mnemonic = 'push' + instr.it_mnemonic
   insr.operands = '{{unwind_regs_a:registers}}'
