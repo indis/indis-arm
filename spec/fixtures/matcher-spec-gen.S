@@ -136,15 +136,28 @@ ldrh r7, [r0, r1]
 ldrb r2, [r3, r4]
 ldrsh r5, [r6, r7]
 
+str r0, [r1, #124]
+ldr r2, [r3, #60]
+strb r4, [r5, #24]
+ldrb r6, [r7, #30]
+strh r0, [r1, #60]
+ldrh r2, [r3, #32]
+str r4, [sp, #1020]
+ldr r5, [sp, #220]
+
 //// Generate PC-relative address, see ADR on page A8-320
 
-// TODO
+// adr r0, L0 // outputs f2af002a subw r0, pc, #42
 
 //// Generate SP-relative address, see ADD (SP plus immediate) on page A8-314
 
-// TODO
+add r0, sp, 1020
 
 //// Miscellaneous 16-bit instructions on page A6-226
+//add sp, sp, 508 // outputs b07f add sp, #508
+//sub sp, sp, 100
+//cbz r1, L1 // integration test, outputs b109 cbz r1, 0xb2
+//cbnz r2, L1
 
 //// Store multiple registers, see STM (STMIA, STMEA) on page A8-662
 
@@ -158,6 +171,7 @@ ldrsh r5, [r6, r7]
 // udf 250
 
 svc 215
+L1:
 svc 12
 
 //// Unconditional Branch, see B on page A8-332

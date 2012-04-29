@@ -22,9 +22,9 @@ matcher :thumb => :thumb16 do |instr, bytes|
     when 0b01001
       match :ldr_literal, instr, bytes
     when 0b10100
-      common :add_reg_immed, instr, bytes, 'adr', 'pc'
+      common :add_reg_immed, instr, bytes, 'adr', 15
     when 0b10101
-      common :add_reg_immed, instr, bytes, 'add', 'sp'
+      common :add_reg_immed, instr, bytes, 'add', 13
       instr.sets_flags = false
     when 0b11000
       match :stm, instr, bytes
@@ -444,7 +444,7 @@ common :add_reg_immed do |instr, bytes, name, regn|
   rd   = (bytes >> 8) & 0b111
   imm8 = bytes        & 0b11111111
   imm32 = h.ZeroExtend(imm8 << 2, 32)
-  instr.values rd: rd, imm8: imm8, imm32: imm32, add: true, rn: regn
+  instr.values = { rd: rd, imm8: imm8, imm32: imm32, add: true, rn: regn }
   instr.mnemonic = name + instr.it_mnemonic
   instr.operands = '{{rd}}, {{rn}}, #{{imm32}}'
 end
@@ -540,9 +540,9 @@ end
 
 common :addsub_sp_imm do |instr, bytes, name|
   imm7 = bytes & 0b1111111
-  imm32 = h.ZeroExtend(imm8 << 2, 32)
+  imm32 = h.ZeroExtend(imm7 << 2, 32)
   instr.sets_flags = false
-  instr.values rd: 13, imm7: imm7, imm32: imm32
+  instr.values = { rd: 13, imm7: imm7, imm32: imm32 }
   instr.mnemonic = name + instr.it_mnemonic
   instr.operands = 'sp, sp, #{{imm32}}'
 end
@@ -557,7 +557,7 @@ matcher :misc => :cbz_cbnz do |instr, bytes|
   raise UnpredictableError if instr.in_it?
   instr.mnemonic = nonzero ? 'cbnz' : 'cbz'
   instr.values = { rn: rn, imm5: imm5, imm32: imm32, nonzero: nonzero }
-  instr.operands = '{{rn}}, pc, #{{imm32}}'
+  instr.operands = '{{rn}}, {{hex:offset_from_pc:imm32}}'
 end
 
 matcher :misc => :bkpt do |instr, bytes|

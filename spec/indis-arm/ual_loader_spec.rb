@@ -33,7 +33,10 @@ describe Indis::ARM::UalLoader do
       
       0x4b01 => 'ldr r3, [pc, #4]',
       
+      # TODO: adr
       
+      0xb07f => 'add sp, sp, #508',
+      0xb099 => 'sub sp, sp, #100',
       
       0xe7fa => 'b -12',
     }

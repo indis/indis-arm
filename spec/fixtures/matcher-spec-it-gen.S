@@ -1,6 +1,8 @@
 .syntax unified
 .thumb
 
+cbz r1, L1
+
 it ne
 movne r1, r2
 
@@ -12,6 +14,7 @@ ite vs
 movvs r1, r2
 movvc r7, r0
 
+L1:
 itete ls
 movls r0, r1
 movhi r2, r3

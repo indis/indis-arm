@@ -73,5 +73,14 @@
 00000090	    5a47	ldrh	r7, [r0, r1]
 00000092	    5d1a	ldrb	r2, [r3, r4]
 00000094	    5ff5	ldrsh	r5, [r6, r7]
-00000096	    dfd7	svc	215
-00000098	    df0c	svc	12
+00000096	    67c8	str	r0, [r1, #124]
+00000098	    6bda	ldr	r2, [r3, #60]
+0000009a	    762c	strb	r4, [r5, #24]
+0000009c	    7fbe	ldrb	r6, [r7, #30]
+0000009e	    8788	strh	r0, [r1, #60]
+000000a0	    8c1a	ldrh	r2, [r3, #32]
+000000a2	    94ff	str	r4, [sp, #1020]
+000000a4	    9d37	ldr	r5, [sp, #220]
+000000a6	    a8ff	add	r0, sp, #1020
+000000a8	    dfd7	svc	215
+000000aa	    df0c	svc	12
