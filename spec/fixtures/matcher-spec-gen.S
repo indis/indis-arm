@@ -168,6 +168,9 @@ setend be
 setend le
 cpsie a
 cpsid if
+rev r1, r3
+rev16 r4, r5
+revsh r7, r6
 
 //// Store multiple registers, see STM (STMIA, STMEA) on page A8-662
 

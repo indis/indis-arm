@@ -92,5 +92,8 @@
 000000b6	    b650	setend	le
 000000b8	    b664	cpsie	a
 000000ba	    b673	cpsid	if
-000000bc	    dfd7	svc	215
-000000be	    df0c	svc	12
+000000bc	    ba19	rev	r1, r3
+000000be	    ba6c	rev16	r4, r5
+000000c0	    baf7	revsh	r7, r6
+000000c2	    dfd7	svc	215
+000000c4	    df0c	svc	12

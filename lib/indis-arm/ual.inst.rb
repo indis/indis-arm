@@ -473,7 +473,7 @@ matcher :thumb16 => :misc do |instr, bytes|
       common :sxt_rd_rm, instr, bytes, 'rev'
     when 0b101001
       common :sxt_rd_rm, instr, bytes, 'rev16'
-    when 0b10111
+    when 0b101011
       common :sxt_rd_rm, instr, bytes, 'revsh'
     else
       opcode5 = opcode6 >> 1
