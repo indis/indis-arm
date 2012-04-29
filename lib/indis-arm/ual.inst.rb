@@ -507,9 +507,9 @@ end
 
 matcher :misc => :setend do |instr, bytes|
   e = (bytes >> 3) & 0b1
-  instr.name = 'setend'
+  instr.mnemonic = 'setend'
   instr.values = { e: e }
-  instr.operands = e == 1 ? 'big' : 'little'
+  instr.operands = e == 1 ? 'be' : 'le'
   raise UnpredictableError if instr.in_it?
 end
 

@@ -164,6 +164,8 @@ uxth r7, r0
 uxtb r1, r2
 push {r1, r2, r3, lr}
 push {r3-r7}
+setend be
+setend le
 
 //// Store multiple registers, see STM (STMIA, STMEA) on page A8-662
 

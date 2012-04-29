@@ -88,5 +88,7 @@
 000000ae	    b2d1	uxtb	r1, r2
 000000b0	    b50e	push	{r1, r2, r3, lr}
 000000b2	    b4f8	push	{r3, r4, r5, r6, r7}
-000000b4	    dfd7	svc	215
-000000b6	    df0c	svc	12
+000000b4	    b658	setend	be
+000000b6	    b650	setend	le
+000000b8	    dfd7	svc	215
+000000ba	    df0c	svc	12
