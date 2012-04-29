@@ -27,7 +27,7 @@ module Indis
         if val
           format_value(fmt_sym, val)
         else
-          if fmt[0] == 'r'
+          if %w(rn rm rt rd rdn rdm).include?(fmt)
             register_to_s(self.values[fmt_sym])
           else
             self.values[fmt_sym]
