@@ -171,6 +171,9 @@ cpsid if
 rev r1, r3
 rev16 r4, r5
 revsh r7, r6
+pop {r5-r7,pc}
+pop {r1}
+//bkpt 242 // outputs bef2 bkpt 0x00f2
 
 //// Store multiple registers, see STM (STMIA, STMEA) on page A8-662
 

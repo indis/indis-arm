@@ -95,5 +95,7 @@
 000000bc	    ba19	rev	r1, r3
 000000be	    ba6c	rev16	r4, r5
 000000c0	    baf7	revsh	r7, r6
-000000c2	    dfd7	svc	215
-000000c4	    df0c	svc	12
+000000c2	    bde0	pop	{r5, r6, r7, pc}
+000000c4	    bc02	pop	{r1}
+000000c6	    dfd7	svc	215
+000000c8	    df0c	svc	12

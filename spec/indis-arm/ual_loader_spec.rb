@@ -38,6 +38,8 @@ describe Indis::ARM::UalLoader do
       0xb07f => 'add sp, sp, #508',
       0xb099 => 'sub sp, sp, #100',
       
+      0xbef2 => 'bkpt 0xf2',
+      
       0xe7fa => 'b -12',
     }
     

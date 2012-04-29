@@ -564,7 +564,7 @@ matcher :misc => :bkpt do |instr, bytes|
   imm8 = bytes & 0b11111111
   instr.mnemonic = 'bkpt'
   instr.values = { imm8: imm8 }
-  instr.operands '#{{imm8}}'
+  instr.operands = '{{hex:imm8}}'
 end
 
 matcher :misc => :ifthen do |instr, bytes|
@@ -639,8 +639,8 @@ matcher :misc => :pop do |instr, bytes|
   common :pushpopregs, instr, bytes
   instr.values[:registers] << 15 if p == 1
   instr.values[:unaligned_allowed] = false
-  instr.mnemonic = 'push' + instr.it_mnemonic
-  insr.operands = '{{unwind_regs_a:registers}}'
+  instr.mnemonic = 'pop' + instr.it_mnemonic
+  instr.operands = '{{unwind_regs_a:registers}}'
   raise UnpredictableError if p == 1 && instr.in_it? && instr.position_in_it != 4
 end
 
