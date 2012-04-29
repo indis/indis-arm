@@ -21,6 +21,43 @@ module Indis
     
     module FormatHelper
       private
+      def process_formatter(val)
+        (fmt, val) = val.split(':',2)
+        fmt_sym = fmt.to_sym
+        if val
+          format_value(fmt_sym, val)
+        else
+          if fmt[0] == 'r'
+            register_to_s(self.values[fmt_sym])
+          else
+            self.values[fmt_sym]
+          end
+        end
+      end
+        
+      def format_value(fmt, val)
+        processed_val = process_formatter(val)
+        case fmt
+        when :offset_from_pc
+          @vmaddr + 4 + processed_val
+        when :hex
+          '0x' + processed_val.to_s(16)
+        else
+          raise RuntimeError, "Unknown formatter #{fmt} for #{val}, with traits #{@traits}"
+        end
+      end
+      
+      def operands_subst
+        o = @operands.dup
+        while o.index('{')
+          o.gsub!(/{{[^}]+}}/) do |mstr|
+            argn = mstr[2...-2]
+            process_formatter(argn)
+          end
+        end
+        o
+      end
+      
       def register_to_s(regn)
         names = %w(r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 sl fp ip sp lr pc)
         names[regn]

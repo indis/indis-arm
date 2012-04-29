@@ -45,20 +45,6 @@ module Indis
         @traits = []
       end
 
-      def operands_subst
-        o = @operands.dup
-        while o.index('{')
-          o.gsub!(/{{[^}]+}}/) do |mstr|
-            if mstr[2] == 'r'
-              register_to_s(self.values[mstr[2...-2].to_sym])
-            else
-              self.values[mstr[2...-2].to_sym]
-            end
-          end
-        end
-        o
-      end
-
       def to_s
         "#{@mnemonic} #{operands_subst}"
       end
