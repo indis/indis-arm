@@ -38,6 +38,10 @@ module Indis
       
       def map_instruction(instr, bytes, root)
         match(root, instr, bytes)
+        if instr.lazy
+          instr.lazy.each { |args| common(*args) }
+          instr.lazy = nil
+        end
         instr
       end
       
@@ -52,6 +56,10 @@ module Indis
         cname = args.shift
         args[0].traits << cname
         instance_exec(*args, &@commons[cname])
+      end
+      
+      def common_lazy(*args)
+        args[1].lazy << args if args[1]
       end
       
       def load_ual

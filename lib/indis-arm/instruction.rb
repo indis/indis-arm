@@ -32,7 +32,7 @@ module Indis
       include FormatHelper
       
       attr_reader :traits
-      attr_accessor :size, :mnemonic, :values, :operands, :sets_flags
+      attr_accessor :size, :mnemonic, :values, :operands, :sets_flags, :lazy
 
       def initialize(size, ofs)
         super(ofs)
@@ -44,6 +44,7 @@ module Indis
         @in_it = false
         @last_in_it = false
         @traits = []
+        @lazy = []
       end
 
       def to_s
