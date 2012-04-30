@@ -97,5 +97,10 @@
 000000c0	    baf7	revsh	r7, r6
 000000c2	    bde0	pop	{r5, r6, r7, pc}
 000000c4	    bc02	pop	{r1}
-000000c6	    dfd7	svc	215
-000000c8	    df0c	svc	12
+000000c6	    bf00	nop
+000000c8	    bf10	yield
+000000ca	    bf20	wfe
+000000cc	    bf30	wfi
+000000ce	    bf40	sev
+000000d0	    dfd7	svc	215
+000000d2	    df0c	svc	12

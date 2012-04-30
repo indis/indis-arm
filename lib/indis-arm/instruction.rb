@@ -46,7 +46,12 @@ module Indis
       end
 
       def to_s
-        "#{@mnemonic} #{operands_subst}"
+        operands = operands_subst
+        if operands.length > 0
+          "#{@mnemonic} #{operands}"
+        else
+          @mnemonic
+        end
       end
     end
     

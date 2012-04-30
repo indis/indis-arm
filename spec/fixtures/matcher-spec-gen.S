@@ -174,6 +174,11 @@ revsh r7, r6
 pop {r5-r7,pc}
 pop {r1}
 //bkpt 242 // outputs bef2 bkpt 0x00f2
+nop
+yield
+wfe
+wfi
+sev
 
 //// Store multiple registers, see STM (STMIA, STMEA) on page A8-662
 
