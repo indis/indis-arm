@@ -32,7 +32,7 @@ module Indis
       include FormatHelper
       
       attr_reader :traits
-      attr_accessor :size, :mnemonic, :values, :operands, :sets_flags, :lazy
+      attr_accessor :size, :mnemonic, :values, :operands, :sets_flags, :lazy, :namespace
 
       def initialize(size, ofs)
         super(ofs)

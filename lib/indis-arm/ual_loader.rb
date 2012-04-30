@@ -30,13 +30,14 @@ module Indis
     class UalLoader
       include Singleton
       
-      attr_reader :matchers, :commons
+      attr_reader :namespaces, :commons
       
       def initialize
         load_ual
       end
       
       def map_instruction(instr, bytes, root)
+        instr.namespace = root
         match(root, instr, bytes)
         if instr.lazy
           instr.lazy.each { |args| common(*args) }
@@ -48,7 +49,7 @@ module Indis
       private
       def match(name, instr, bytes)
         instr.traits << name
-        matcher = @matchers[name]
+        matcher = @namespaces[instr.namespace][name]
         instance_exec(instr, bytes, &matcher.proc)
       end
       
@@ -64,14 +65,24 @@ module Indis
       
       def load_ual
         instr_file = File.join(File.dirname(__FILE__), 'ual.inst.rb')
-        dsl = UalTopLevelDSL.new
+        dsl = self.class.dsl_parser.new
         dsl.instance_eval open(instr_file).read, instr_file, 1
-        @matchers = dsl.matchers
+        @namespaces = dsl.namespaces
         @commons = dsl.commons
       end
       
       def h
         @instructions_helper ||= UalInstructionsHelper.new
+      end
+      
+      class << self
+        def dsl_parser=(klass)
+          @dsl_parser = klass
+        end
+        
+        def dsl_parser
+          @dsl_parser ||= UalTopLevelDSL
+        end
       end
     end
     
@@ -84,25 +95,28 @@ module Indis
     end
     
     class UalTopLevelDSL
-      attr_reader :matchers, :commons
+      attr_reader :namespaces, :commons
       
       def initialize
-        @matchers = {}
         @commons = {}
+        @namespaces = Hash.new { |h,k| h[k] = Hash.new }
+        @current_namespace = nil
       end
       
       def matcher(args, &block)
+        matchers = @namespaces[@current_namespace]
+        
         if args.is_a?(Hash)
           from = args.keys.first
           to = args[from]
-          raise RuntimeError, "No parent matcher #{from} for matcher #{to}" unless @matchers[from]
+          raise RuntimeError, "No parent matcher #{from} for matcher #{to}" unless matchers[from]
         else
           to = args
         end
         
-        raise RuntimeError, "Matcher #{to} is already defined" if @matchers[to]
+        raise RuntimeError, "Matcher #{to} is already defined" if matchers[to]
         
-        @matchers[to] = Matcher.new(to, block)
+        matchers[to] = Matcher.new(to, block)
       end
       
       def common(name, &block)
@@ -110,6 +124,14 @@ module Indis
         
         @commons[name] = block
       end
+      
+      def namespace(name, &block)
+        @current_namespace = name
+        yield
+        @current_namespace = nil
+      end
+    end
+    
     end
     
   end

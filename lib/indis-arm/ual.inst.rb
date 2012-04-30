@@ -1,15 +1,6 @@
-matcher :thumb do |instr, bytes|
-  opcode = bytes >> 11
-  if opcode == 0b11101 || opcode == 0b11110 || opcode == 0b11111
-    instr.size = 4
-    match :thumb32, instr, bytes
-  else
-    instr.size = 2
-    match :thumb16, instr, bytes
-  end
-end
+namespace :thumb16 do
 
-matcher :thumb => :thumb16 do |instr, bytes|
+matcher :thumb16 do |instr, bytes|
   opcode6 = bytes >> 10
   case opcode6
   when 0b010000
@@ -736,3 +727,6 @@ matcher :thumb16 => :b do |instr, bytes|
   instr.values = { imm11: imm11, imm32: imm32 }
   instr.operands = '{{hex:offset_from_pc:imm32}}'
 end
+
+end
+
