@@ -709,11 +709,11 @@ end
 
 matcher :thumb16 => :b do |instr, bytes|
   imm11 = bytes & 0b11111111111
-  imm32 = h.SignExtend(imm11 << 1, 32)
+  imm32 = (imm11 << 1).set_bitlen(12).to_signed
   
   raise UnpredictableError if instr.in_it? && instr.position_in_it != 4
   
-  instr.mnemonic = 'b' + instr.it_mnemonic
+  instr.mnemonic = 'b' + instr.it_mnemonic + '.n'
   instr.values = { imm11: imm11, imm32: imm32 }
-  instr.operands = '{{imm32}}'
+  instr.operands = '{{hex:offset_from_pc:imm32}}'
 end

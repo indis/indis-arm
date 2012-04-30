@@ -6,6 +6,7 @@ cbz r1, L1
 
 it ne
 movne r1, r2
+b L1
 
 bne L1
 bgt L1

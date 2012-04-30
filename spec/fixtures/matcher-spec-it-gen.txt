@@ -1,19 +1,20 @@
-00000000	    d00a	beq.n	0x18
-00000002	    b149	cbz	r1, 0x18
+00000000	    d00b	beq.n	0x1a
+00000002	    b151	cbz	r1, 0x1a
 00000004	    bf18	it	ne
 00000006	    4611	movne	r1, r2
-00000008	    d106	bne.n	0x18
-0000000a	    dc05	bgt.n	0x18
-0000000c	    bfc4	itt	gt
-0000000e	    4611	movgt	r1, r2
-00000010	    4634	movgt	r4, r6
-00000012	    bf6c	ite	vs
-00000014	    4611	movvs	r1, r2
-00000016	    4607	movvc	r7, r0
-00000018	    bf95	itete	ls
-0000001a	    4608	movls	r0, r1
-0000001c	    461a	movhi	r2, r3
-0000001e	    462c	movls	r4, r5
-00000020	    463e	movhi	r6, r7
-00000022	    4638	mov	r0, r7
-00000024	    d8f8	bhi.n	0x18
+00000008	    e007	b.n	0x1a
+0000000a	    d106	bne.n	0x1a
+0000000c	    dc05	bgt.n	0x1a
+0000000e	    bfc4	itt	gt
+00000010	    4611	movgt	r1, r2
+00000012	    4634	movgt	r4, r6
+00000014	    bf6c	ite	vs
+00000016	    4611	movvs	r1, r2
+00000018	    4607	movvc	r7, r0
+0000001a	    bf95	itete	ls
+0000001c	    4608	movls	r0, r1
+0000001e	    461a	movhi	r2, r3
+00000020	    462c	movls	r4, r5
+00000022	    463e	movhi	r6, r7
+00000024	    4638	mov	r0, r7
+00000026	    d8f8	bhi.n	0x1a
