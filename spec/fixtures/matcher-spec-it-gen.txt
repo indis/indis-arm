@@ -18,3 +18,16 @@
 00000022	    463e	movhi	r6, r7
 00000024	    4638	mov	r0, r7
 00000026	    d8f8	bhi.n	0x1a
+00000028	    bf1f	itttt	ne
+0000002a	    0148	lslne	r0, r1, #5
+0000002c	    1148	asrne	r0, r1, #5
+0000002e	    19e8	addne	r0, r5, r7
+00000030	    1be8	subne	r0, r5, r7
+00000032	    bf3f	itttt	cc
+00000034	    1df9	addcc	r1, r7, #7
+00000036	    1e3b	subcc	r3, r7, #0
+00000038	    2101	movcc	r1, #1
+0000003a	    2dfd	cmpcc	r5, #253
+0000003c	    bf84	itt	hi
+0000003e	    35df	addhi	r5, #223
+00000040	    3d64	subhi	r5, #100

@@ -28,3 +28,18 @@ movhi r6, r7
 mov r0, r7
 
 bhi L1
+
+////
+itttt ne
+lslne r0, r1, #5 // A8.8.94
+asrne r0, r1, #5 // A8.8.16
+addne r0, r5, r7 // A8.8.6
+subne r0, r5, r7 // A8.8.223
+itttt lo
+addlo r1, r7, #7 // A8.8.4
+sublo r3, r7, #0
+movlo r1, #1 // A8.8.102
+cmplo r5, #253 // A8.8.37
+itt hi
+addhi r5, #223 // A8.8.4
+subhi r5, #100 // A8.8.221
