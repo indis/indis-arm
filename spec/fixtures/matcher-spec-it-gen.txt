@@ -28,6 +28,72 @@
 00000036	    1e3b	subcc	r3, r7, #0
 00000038	    2101	movcc	r1, #1
 0000003a	    2dfd	cmpcc	r5, #253
-0000003c	    bf84	itt	hi
+0000003c	    bf81	itttt	hi
 0000003e	    35df	addhi	r5, #223
 00000040	    3d64	subhi	r5, #100
+00000042	    402b	andhi	r3, r5
+00000044	    4046	eorhi	r6, r0
+00000046	    bfc1	itttt	gt
+00000048	    40b4	lslgt	r4, r6
+0000004a	    4129	asrgt	r1, r5
+0000004c	    417c	adcgt	r4, r7
+0000004e	    41b0	sbcgt	r0, r6
+00000050	    bf3f	itttt	cc
+00000052	    41df	rorcc	r7, r3
+00000054	    420c	tstcc	r4, r1
+00000056	    4283	cmpcc	r3, r0
+00000058	    42d3	cmncc	r3, r2
+0000005a	    bf61	itttt	vs
+0000005c	    4314	orrvs	r4, r2
+0000005e	    43a9	bicvs	r1, r5
+00000060	    43cd	mvnvs	r5, r1
+00000062	    18d1	addvs	r1, r2, r3
+00000064	    bf01	itttt	eq
+00000066	    449a	addeq	sl, r3
+00000068	    44e8	addeq	r8, sp
+0000006a	    45fb	cmpeq	fp, pc
+0000006c	    45d1	cmpeq	r9, sl
+0000006e	    bf22	ittt	cs
+00000070	    4611	movcs	r1, r2
+00000072	    466b	movcs	r3, sp
+00000074	    46f7	movcs	pc, lr
+00000076	    bf3f	itttt	cc
+00000078	    5088	strcc	r0, [r1, r2]
+0000007a	    5363	strhcc	r3, [r4, r5]
+0000007c	    543e	strbcc	r6, [r7, r0]
+0000007e	    56d1	ldrsbcc	r1, [r2, r3]
+00000080	    bf1f	itttt	ne
+00000082	    59ac	ldrne	r4, [r5, r6]
+00000084	    5a47	ldrhne	r7, [r0, r1]
+00000086	    5d1a	ldrbne	r2, [r3, r4]
+00000088	    5ff5	ldrshne	r5, [r6, r7]
+0000008a	    bfbf	itttt	lt
+0000008c	    67c8	strlt	r0, [r1, #124]
+0000008e	    6bda	ldrlt	r2, [r3, #60]
+00000090	    762c	strblt	r4, [r5, #24]
+00000092	    7fbe	ldrblt	r6, [r7, #30]
+00000094	    bfc1	itttt	gt
+00000096	    8788	strhgt	r0, [r1, #60]
+00000098	    8c1a	ldrhgt	r2, [r3, #32]
+0000009a	    94ff	strgt	r4, [sp, #1020]
+0000009c	    9d37	ldrgt	r5, [sp, #220]
+0000009e	    bf3f	itttt	cc
+000000a0	    b223	sxthcc	r3, r4
+000000a2	    b275	sxtbcc	r5, r6
+000000a4	    b287	uxthcc	r7, r0
+000000a6	    b2d1	uxtbcc	r1, r2
+000000a8	    bf01	itttt	eq
+000000aa	    b50e	pusheq	{r1, r2, r3, lr}
+000000ac	    b4f8	pusheq	{r3, r4, r5, r6, r7}
+000000ae	    ba19	reveq	r1, r3
+000000b0	    ba6c	rev16eq	r4, r5
+000000b2	    bf21	itttt	cs
+000000b4	    baf7	revshcs	r7, r6
+000000b6	    bc02	popcs	{r1}
+000000b8	    bf00	nopcs
+000000ba	    bde0	popcs	{r5, r6, r7, pc}
+000000bc	    bf81	itttt	hi
+000000be	    bf10	yieldhi
+000000c0	    bf20	wfehi
+000000c2	    bf30	wfihi
+000000c4	    bf40	sevhi
