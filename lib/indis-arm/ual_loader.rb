@@ -132,6 +132,26 @@ module Indis
       end
     end
     
+    class DebugUalTopLevelDSL < UalTopLevelDSL
+      def matcher(args, &block)
+        if args.is_a?(Hash)
+          from = args.keys.first
+          to = args[from]
+        else
+          from = ''
+          to = args
+        end
+        
+        puts "matcher #{sprintf('%30s', from)} => #{to}"
+        
+        super
+      end
+      
+      def common(name, &block)
+        puts "common  #{name}"
+        
+        super
+      end
     end
     
   end
