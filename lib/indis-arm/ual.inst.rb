@@ -730,3 +730,140 @@ end
 
 end
 
+namespace :thumb32 do
+
+matcher :thumb => :thumb32 do |instr, bytes|
+  op1 = bytes[27..28]
+  op2 = bytes[20..26]
+  op = bytes[15]
+  
+  case op1
+  when 0b01
+    if op2 >> 5 == 0b00
+      if op2[2] == 0
+        match :loadstore_multiple, instr, bytes
+      else
+        match :loadstore_dual_excl_table, instr, bytes
+      end
+    elsif op2 >> 5 == 0b01
+      match :data_processing_shift_reg, instr, bytes
+    else
+      match :coproc_asimd_fp, instr, bytes
+    end
+  when 0b10
+    if op == 0
+      if op2[5] == 0
+        match :data_processing_mod_imm, instr, bytes
+      else
+        match :data_processing_pbimm, instr, bytes
+      end
+    else
+      match :branches_misc, instr, bytes
+    end
+  when 0b11
+    if op2[6] == 0
+      if op2[5] == 0
+        if op2[4] == 0 && op2[0] == 0
+          match :store_single_data, instr, bytes
+        elsif op2[4] == 1 && op2[0] == 0
+          match :asimd_strloadstore, instr, bytes
+        else
+          case op2[0..2]
+          when 0b001
+            match :load_byte_memhints, instr, bytes
+          when 0b011
+            match :load_hword_memhints, instr, bytes
+          when 0b101
+            match :load_word, instr, bytes
+          when 0b111
+            raise UndefinedError
+          end
+        end
+      else
+        if op2[4] == 0
+          match :data_processing_reg, instr, bytes
+        else
+          if op2[3..4] == 0b10
+            match :mul_mulacc_absdiff, instr, bytes
+          elsif op2[3..4] == 0b11
+            match :longmul_longmulacc_div, instr, bytes
+          else
+            raise BadMatchError
+          end
+        end
+      end
+    else
+      match :coproc_asimd_fp, instr, bytes
+    end
+  else
+    raise BadMatchError
+  end
+end
+
+matcher :thumb32 => :loadstore_multiple do |instr, bytes|
+  op = bytes[23..24]
+  w  = bytes[21]
+  l  = bytes[20]
+  rn = bytes[16..19]
+  
+  case op
+  when 0b00, 0b11
+    if l == 0
+      match :srs, instr, bytes
+    else
+      match :rfe, instr, bytes
+    end
+  when 0b01
+    if l == 0
+      match :stm, instr, bytes
+    else
+      if w == 1 && rn == 0b1101
+        match :pop, instr, bytes
+      else
+        match :ldm, instr, bytes
+      end
+    end
+  when 0b10
+    if l == 1
+      match :ldmdb_ea, instr, bytes
+    else
+      if w == 1 && rn == 0b1101
+        match :push, instr, bytes
+      else
+        match :stmdb_fd, instr, bytes
+      end
+    end
+  end
+end
+
+common :srs_rfe_wback_increment do |instr, bytes, name|
+  op   = bytes[23..24]
+  w    = bytes[21]
+  
+  wback = (w == 1)
+  increment = (op == 0b11)
+
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = name + (increment ? 'ia' : 'db')
+  instr.values = { wback: wback, increment: increment, mode: mode }
+end
+
+matcher :loadstore_multiple => :srs do |instr, bytes|
+  mode = bytes[0..4]
+  
+  common :srs_rfe_wback_increment, instr, bytes, 'srs'
+  instr[:rn] = 13
+  instr.operands = '{{rn}}{{iftrue<!>:wback}}, {{arm_mode:mode}}'
+end
+
+matcher :loadstore_multiple => :rfe do |instr, bytes|
+  rn = bytes[16..19]
+  raise UnpredictableError if rn == 15
+  raise UnpredictableError if instr.in_it? && !instr.last_in_it?
+  
+  common :srs_rfe_wback_increment, instr, bytes, 'rfe'
+  instr[:rn] = rn
+  instr.operands = '{{rn}}{{iftrue<!>:wback}}'
+end
+
+end
