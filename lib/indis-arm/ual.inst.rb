@@ -329,8 +329,8 @@ matcher :spec_data_bx => :add do |instr, bytes|
   
   match :add_sp, instr, bytes if d == 0b1101 || rm == 0b1101 # SEE ADD (SP plus register)
   raise UnpredictableError if d == 15 && rm == 15
-  raise UnpredictableError if d == 15 && instr.in_it? && instr.position_in_it != 4
   instr.mnemonic = 'add' + instr.it_mnemonic
+  raise UnpredictableError if d == 15 && instr.in_it? && !instr.last_in_it?
   instr.values = { rd: d, rn: d, rdn: d, rm: rm, shift_t: :lsl, shift_n: 0 }
   instr.operands = '{{rdn}}, {{rm}}'
   instr.sets_flags = false
@@ -361,7 +361,7 @@ matcher :spec_data_bx => :mov do |instr, bytes|
   rd = bytes        & 0b111
   d  = (d1 << 3) + rd
   
-  raise UnpredictableError if d == 15 && instr.in_it? && instr.position_in_it != 4
+  raise UnpredictableError, "#{instr.traits} is unpredictable" if d == 15 && instr.in_it? && !instr.last_in_it?
   instr.sets_flags = false
   instr.mnemonic = 'mov' + instr.it_mnemonic
   instr.values = { rd: d, rm: rm }
@@ -370,8 +370,8 @@ end
 
 common :bx_blx do |instr, bytes, name|
   rm = (bytes >> 3) & 0b1111
-  raise UnpredictableError if instr.in_it? && instr.position_in_it != 4
   instr.mnemonic = name + instr.it_mnemonic
+  raise UnpredictableError if instr.in_it? && !instr.last_in_it?
   instr.values = { rm: rm }
   instr.operands = '{{rm}}'
 end
@@ -641,7 +641,7 @@ matcher :misc => :pop do |instr, bytes|
   instr.values[:unaligned_allowed] = false
   instr.mnemonic = 'pop' + instr.it_mnemonic
   instr.operands = '{{unwind_regs_a:registers}}'
-  raise UnpredictableError if p == 1 && instr.in_it? && instr.position_in_it != 4
+  raise UnpredictableError if p == 1 && instr.in_it? && !instr.last_in_it?
 end
 
 common :stmldm do |instr, bytes, name|
@@ -711,7 +711,7 @@ matcher :thumb16 => :b do |instr, bytes|
   imm11 = bytes & 0b11111111111
   imm32 = (imm11 << 1).set_bitlen(12).to_signed
   
-  raise UnpredictableError if instr.in_it? && instr.position_in_it != 4
+  raise UnpredictableError if instr.in_it? && !instr.last_in_it?
   
   instr.mnemonic = 'b' + instr.it_mnemonic + '.n'
   instr.values = { imm11: imm11, imm32: imm32 }

@@ -42,6 +42,7 @@ module Indis
         @operands = ''
         @it_mnemonic = ''
         @in_it = false
+        @last_in_it = false
         @traits = []
       end
 

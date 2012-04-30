@@ -20,10 +20,15 @@ module Indis
   module ARM
     
     module ThumbIt
-      attr_accessor :it_mnemonic, :in_it
+      attr_accessor :it_mnemonic
+      attr_writer :in_it, :last_in_it
       
       def in_it?
         @in_it
+      end
+      
+      def last_in_it?
+        @last_in_it
       end
     end
     

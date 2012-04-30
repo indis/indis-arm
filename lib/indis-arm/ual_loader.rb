@@ -25,6 +25,7 @@ module Indis
   module ARM
     
     class BadMatchError < RuntimeError; end
+    class UnpredictableError < RuntimeError; end
     
     class UalLoader
       include Singleton

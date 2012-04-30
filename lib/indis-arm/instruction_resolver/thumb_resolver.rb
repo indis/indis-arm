@@ -43,6 +43,7 @@ module Indis
             if @it_conditions.length > 0
               instr.it_mnemonic = @it_conditions.shift
               instr.in_it = true
+              instr.last_in_it = @it_conditions.length == 0
             end
             
             loader.map_instruction(instr, bytes, :thumb16)
