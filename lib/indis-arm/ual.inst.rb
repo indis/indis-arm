@@ -698,13 +698,13 @@ end
 matcher :b_svc => :cond_b do |instr, bytes|
   cond = (bytes >> 8) & 0b1111
   imm8 = bytes & 0b11111111
-  imm32 = h.SignExtend(imm8 << 1, 32)
+  imm32 = (imm8 << 1).set_bitlen(9).to_signed
   
   raise UnpredictableError if instr.in_it?
   
-  instr.mnemonic = 'b' + h.cond_to_mnemonic(cond)
+  instr.mnemonic = 'b' + h.cond_to_mnemonic(cond) + '.n'
   instr.values = { imm8: imm8, imm32: imm32 }
-  instr.operands = '{{imm32}}'
+  instr.operands = '{{hex:offset_from_pc:imm32}}'
 end
 
 matcher :thumb16 => :b do |instr, bytes|

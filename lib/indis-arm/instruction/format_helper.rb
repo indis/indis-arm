@@ -41,7 +41,7 @@ module Indis
           end
         end
       end
-        
+      
       def format_value(fmt, *valargs)
         val = valargs.shift
         args = valargs.shift
@@ -50,7 +50,7 @@ module Indis
         when :offset_from_pc
           @vmaddr + 4 + processed_val
         when :hex
-          '0x' + processed_val.to_s(16)
+          sprintf('0x%02x', processed_val)
         when :unwind_regs_a
           rr = processed_val.map { |r| register_to_s(r) }.join(', ')
           "{#{rr}}"
