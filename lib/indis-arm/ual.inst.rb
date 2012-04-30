@@ -658,9 +658,10 @@ matcher :thumb16 => :stm do |instr, bytes|
 end
 
 matcher :thumb16 => :ldm do |instr, bytes|
-  common :stmldm, instr, bytes, 'stm'
-  wback = instr.values[:registers].include?(instr.values[:rn])
-  instr.operands = '{{rn}}{{iftrue:wback{!,}]}}, {{unwind_regs_a:registers}}'
+  common :stmldm, instr, bytes, 'ldm'
+  wback = ! instr.values[:registers].include?(instr.values[:rn])
+  instr.values[:wback] = wback
+  instr.operands = '{{rn}}{{iftrue<!>:wback}}, {{unwind_regs_a:registers}}'
 end
 
 matcher :thumb16 => :b_svc do |instr, bytes|

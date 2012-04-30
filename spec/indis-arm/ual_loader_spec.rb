@@ -40,6 +40,11 @@ describe Indis::ARM::UalLoader do
       
       0xbef2 => 'bkpt 0xf2',
       
+      0xc038 => 'stm r0!, {r3, r4, r5}',
+      
+      0xc93e => 'ldm r1, {r1, r2, r3, r4, r5}',
+      0xcbf0 => 'ldm r3!, {r4, r5, r6, r7}',
+      
       0xe7fa => 'b -12',
     }
     

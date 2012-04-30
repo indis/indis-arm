@@ -182,9 +182,12 @@ sev
 
 //// Store multiple registers, see STM (STMIA, STMEA) on page A8-662
 
-
+//stm r0!, {r3-r5} // outputs c038 stmia r0!, {r3, r4, r5}
 
 //// Load multiple registers, see LDM/LDMIA/LDMFD (Thumb) on page A8-394
+
+//ldm r1, {r1-r5} // outputs c93e ldmia r1, {r1, r2, r3, r4, r5}
+//ldm r3!, {r4-r7} // outputs cbf0 ldmia r3!, {r4, r5, r6, r7}
 
 //// Conditional branch, and Supervisor Call on page A6-227
 

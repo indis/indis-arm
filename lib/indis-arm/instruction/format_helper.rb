@@ -25,7 +25,14 @@ module Indis
         (fmt, val) = val.split(':',2)
         fmt_sym = fmt.to_sym
         if val
-          format_value(fmt_sym, val)
+          argindex = fmt.index('<')
+          if argindex
+            fmt_sym = fmt[0...argindex].to_sym
+            args = fmt[argindex+1..-2]
+            format_value(fmt_sym, val, args)
+          else
+            format_value(fmt_sym, val)
+          end
         else
           if %w(rn rm rt rd rdn rdm).include?(fmt)
             register_to_s(self.values[fmt_sym])
@@ -35,7 +42,9 @@ module Indis
         end
       end
         
-      def format_value(fmt, val)
+      def format_value(fmt, *valargs)
+        val = valargs.shift
+        args = valargs.shift
         processed_val = process_formatter(val)
         case fmt
         when :offset_from_pc
@@ -45,6 +54,12 @@ module Indis
         when :unwind_regs_a
           rr = processed_val.map { |r| register_to_s(r) }.join(', ')
           "{#{rr}}"
+        when :iftrue
+          if processed_val
+            args
+          else
+            ''
+          end
         else
           raise RuntimeError, "Unknown formatter #{fmt} for #{val}, with traits #{@traits}"
         end
