@@ -117,7 +117,7 @@ end
 
 common :sets_flags_ouside_of_it do |instr, bytes|
   if instr.in_it?
-    instr.mnemonic += instr.it_mnemonic
+    common_lazy :it_conditional, instr, bytes
     instr.sets_flags = false
   else
     instr.mnemonic += 's'
@@ -201,7 +201,8 @@ matcher :shift_add_sub_mov_cmp => :mov_imm do |instr, bytes|
 end
 
 matcher :shift_add_sub_mov_cmp => :cmp_imm do |instr, bytes|
-  instr.mnemonic = 'cmp' + instr.it_mnemonic
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = 'cmp'
   common :reg_imm8zx, instr, bytes, :rn
 end
 
@@ -262,7 +263,8 @@ end
 common :cmp_cmn_2regs do |instr, bytes, name|
   rm = (bytes >> 3) & 0b111
   rn = bytes        & 0b111
-  instr.mnemonic = name + instr.it_mnemonic
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = name
   instr.values = { rm: rm, rn: rn }
   instr.operands = '{{rn}}, {{rm}}'
 end
@@ -329,8 +331,9 @@ matcher :spec_data_bx => :add do |instr, bytes|
   
   match :add_sp, instr, bytes if d == 0b1101 || rm == 0b1101 # SEE ADD (SP plus register)
   raise UnpredictableError if d == 15 && rm == 15
-  instr.mnemonic = 'add' + instr.it_mnemonic
   raise UnpredictableError if d == 15 && instr.in_it? && !instr.last_in_it?
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = 'add'
   instr.values = { rd: d, rn: d, rdn: d, rm: rm, shift_t: :lsl, shift_n: 0 }
   instr.operands = '{{rdn}}, {{rm}}'
   instr.sets_flags = false
@@ -349,7 +352,8 @@ matcher :spec_data_bx => :cmp do |instr, bytes|
   
   raise UnpredictableError if n < 8 && rm < 8
   raise UnpredictableError if n == 15 && rm == 15
-  instr.mnemonic = 'cmp' + instr.it_mnemonic
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = 'cmp'
   instr.values = { rm: rm, rn: n, shift_t: :lsl, shift_n: 0 }
   instr.operands = '{{rn}}, {{rm}}'
 end
@@ -363,15 +367,17 @@ matcher :spec_data_bx => :mov do |instr, bytes|
   
   raise UnpredictableError, "#{instr.traits} is unpredictable" if d == 15 && instr.in_it? && !instr.last_in_it?
   instr.sets_flags = false
-  instr.mnemonic = 'mov' + instr.it_mnemonic
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = 'mov'
   instr.values = { rd: d, rm: rm }
   instr.operands = '{{rd}}, {{rm}}'
 end
 
 common :bx_blx do |instr, bytes, name|
   rm = (bytes >> 3) & 0b1111
-  instr.mnemonic = name + instr.it_mnemonic
   raise UnpredictableError if instr.in_it? && !instr.last_in_it?
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = name
   instr.values = { rm: rm }
   instr.operands = '{{rm}}'
 end
@@ -382,7 +388,8 @@ matcher :thumb16 => :ldr_literal do |instr, bytes|
   rt   = (bytes >> 8) & 0b111
   imm8 = bytes & 0b11111111
   imm32 = h.ZeroExtend(imm8 << 2, 32)
-  instr.mnemonic = 'ldr' + instr.it_mnemonic
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = 'ldr'
   instr.values = { rt: rt, imm8: imm8, imm32: imm32, add: true }
   instr.operands = '{{rt}}, [pc, #{{imm32}}]'
 end
@@ -404,7 +411,8 @@ matcher :thumb16 => :ldr_single do |instr, bytes|
   when 0b1000
     common :imm5_Rn_Rt_data_load, instr, bytes, (opB1 == 0 ? 'strh' : 'ldrh'), 1
   when 0b1001
-    instr.mnemonic = (opB1 == 0 ? 'str' : 'ldr') + instr.it_mnemonic
+    common_lazy :it_conditional, instr, bytes
+    instr.mnemonic = (opB1 == 0 ? 'str' : 'ldr')
     match :data_load_sprel, instr, bytes
   else
     raise UnknownInstructionError
@@ -415,7 +423,8 @@ common :Rm_Rn_Rt_data_load do |instr, bytes, name|
   rt = bytes        & 0b111
   rn = (bytes >> 3) & 0b111
   rm = (bytes >> 6) & 0b111
-  instr.mnemonic = name + instr.it_mnemonic
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = name
   instr.values = { rt: rt, rn: rn, rm: rm, index: true, add: true, wback: false, shift_t: :lsl, shift_n: 0 }
   instr.operands = '{{rt}}, [{{rn}}, {{rm}}]'
 end
@@ -425,7 +434,8 @@ common :imm5_Rn_Rt_data_load do |instr, bytes, name, shl|
   rn   = (bytes >> 3) & 0b111
   imm5 = (bytes >> 6) & 0b11111
   imm32 = h.ZeroExtend(imm5 << shl, 32)
-  instr.mnemonic = name + instr.it_mnemonic
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = name
   instr.values = { rt: rt, rn: rn, imm5: imm5, imm32: imm32, index: true, add: true, wback: false }
   instr.operands = imm32 == 0 ? '{{rt}}, [{{rn}}]' : '{{rt}}, [{{rn}}, #{{imm32}}]'
 end
@@ -445,7 +455,8 @@ common :add_reg_immed do |instr, bytes, name, regn|
   imm8 = bytes        & 0b11111111
   imm32 = h.ZeroExtend(imm8 << 2, 32)
   instr.values = { rd: rd, imm8: imm8, imm32: imm32, add: true, rn: regn }
-  instr.mnemonic = name + instr.it_mnemonic
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = name
   instr.operands = '{{rd}}, {{rn}}, #{{imm32}}'
 end
 
@@ -533,7 +544,8 @@ end
 common :sxt_rd_rm do |instr, bytes, name|
   rd = bytes        & 0b111
   rm = (bytes >> 3) & 0b111
-  instr.mnemonic = name + instr.it_mnemonic
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = name
   instr.values = { rd: rd, rm: rm, rotation: 0 }
   instr.operands = '{{rd}}, {{rm}}'
 end
@@ -543,7 +555,8 @@ common :addsub_sp_imm do |instr, bytes, name|
   imm32 = h.ZeroExtend(imm7 << 2, 32)
   instr.sets_flags = false
   instr.values = { rd: 13, imm7: imm7, imm32: imm32 }
-  instr.mnemonic = name + instr.it_mnemonic
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = name
   instr.operands = 'sp, sp, #{{imm32}}'
 end
 
@@ -574,7 +587,8 @@ matcher :misc => :ifthen do |instr, bytes|
     names = %w(nop yield wfe wfi sev)
     name = names[opA]
     raise UnknownInstructionError unless name
-    instr.mnemonic = name + instr.it_mnemonic
+    common_lazy :it_conditional, instr, bytes
+    instr.mnemonic = name
   else
     match :it, instr, bytes
   end
@@ -630,7 +644,8 @@ matcher :misc => :push do |instr, bytes|
   common :pushpopregs, instr, bytes
   instr.values[:registers] << 14 if m == 1
   instr.values[:unaligned_allowed] = false
-  instr.mnemonic = 'push' + instr.it_mnemonic
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = 'push'
   instr.operands = '{{unwind_regs_a:registers}}'
 end
 
@@ -639,7 +654,8 @@ matcher :misc => :pop do |instr, bytes|
   common :pushpopregs, instr, bytes
   instr.values[:registers] << 15 if p == 1
   instr.values[:unaligned_allowed] = false
-  instr.mnemonic = 'pop' + instr.it_mnemonic
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = 'pop'
   instr.operands = '{{unwind_regs_a:registers}}'
   raise UnpredictableError if p == 1 && instr.in_it? && !instr.last_in_it?
 end
@@ -647,7 +663,8 @@ end
 common :stmldm do |instr, bytes, name|
   rn = (bytes >> 8) & 0b111
   common :pushpopregs, instr, bytes
-  instr.mnemonic = name + instr.it_mnemonic
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = name
   instr.values[:rn] = rn
   instr.operands = '{{rn}}!, {{unwind_regs_a:registers}}'
 end
@@ -687,12 +704,14 @@ end
 
 matcher :b_svc => :svc do |instr, bytes|
   common :imm8_only_zeroexpand, instr, bytes
-  instr.mnemonic = 'svc' + instr.it_mnemonic
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = 'svc'
 end
 
 matcher :b_svc => :undef do |instr, bytes|
   common :imm8_only_zeroexpand, instr, bytes
-  instr.mnemonic = 'udf' + instr.it_mnemonic
+  common_lazy :it_conditional, instr, bytes
+  instr.mnemonic = 'udf'
 end
 
 matcher :b_svc => :cond_b do |instr, bytes|
