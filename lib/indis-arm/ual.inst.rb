@@ -867,4 +867,25 @@ matcher :loadstore_multiple => :rfe do |instr, bytes|
   instr.operands = '{{rn}}{{iftrue<!>:wback}}'
 end
 
+common :thumb2_wide do |instr, bytes|
+  instr.mnemonic += '.w'
+end
+
+matcher :loadstore_multiple => :stm do |instr, bytes|
+  rn =        bytes[16..19]
+  registers = bytes[0..15] & 0b0101111111111111
+  w =         bytes[21]
+  
+  wback = (w == 1)
+  registers = registers.to_s(2).reverse!.split('').each_with_index.map { |val,idx| val == "1" ? idx : nil }.compact
+  raise UnpredictableError if rn == 15 || registers.length < 2
+  
+  instr.mnemonic = 'stm'
+  common_lazy :it_conditional, instr, bytes
+  common_lazy :thumb2_wide, instr, bytes
+  
+  instr.values = { registers: registers, wback: wback, rn: rn }
+  instr.operands = '{{rn}}{{iftrue<!>:wback}}, {{unwind_regs_a:registers}}'
+end
+
 end
