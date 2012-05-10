@@ -17,7 +17,7 @@
 ##############################################################################
 
 require 'singleton'
-require 'indis-core/binaryops_string'
+require 'indis-core/binaryops_fixnum'
 require 'indis-arm/instruction'
 require 'indis-arm/instruction_helper'
 
