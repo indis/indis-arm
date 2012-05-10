@@ -4,6 +4,7 @@ require 'indis-arm/code_parser'
 
 describe Indis::ARM::CodeParser do
   it "should decode arm instructions in given section" do
+    pending
     t = Indis::Target.new('spec/fixtures/single-object.o')
     t.load
     
@@ -28,6 +29,7 @@ describe Indis::ARM::CodeParser do
   end
   
   it "should parse known instructions" do
+    pending
     code_parser = Indis::ARM::CodeParser.new(double("Target", vmmap: double("VMMap")))
     
     i = code_parser.instance_eval { build_instruction(0, 0xe92d4080) }
@@ -35,11 +37,13 @@ describe Indis::ARM::CodeParser do
   end
   
   it "should load instructions" do
+    pending
     Indis::ARM::CodeParser.load_instructions
     expect { Indis::ARM.const_get('PUSHInstruction_A1') }.not_to raise_error
   end
   
   it "should honor NotThisInstructionError" do
+    pending
     code_parser = Indis::ARM::CodeParser.new(double("Target", vmmap: double("VMMap")))
     
     i = code_parser.instance_eval { build_instruction(0, 0xe59f0024) }

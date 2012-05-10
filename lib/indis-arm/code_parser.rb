@@ -19,7 +19,7 @@
 require 'stringio'
 require 'indis-arm/cpu_state'
 require 'indis-arm/instruction'
-require 'indis-arm/instruction_loader'
+#require 'indis-arm/instruction_loader'
 
 module Indis
   module ARM
