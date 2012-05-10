@@ -53,4 +53,31 @@ describe Indis::ARM::UalLoader do
       end
     end
   end
+  
+  context "thumb-2 parser" do
+    fixtures = open('spec/fixtures/matcher-thumb2-is.disasm').readlines.map { |l| l.strip.split("\t", 3) }
+    
+    fixtures.each do |(adr, val, opc)|
+      opc.gsub!("\t", " ")
+      it "parses 0x#{val.strip} as \"#{opc}\"" do
+        i = Indis::ARM::UalLoader.instance.map_instruction(Indis::ARM::Instruction.new(4, 0), val.to_i(16), :thumb32)
+        i.should decode_to_opcode(opc)
+      end
+    end
+    
+    special_cases = {
+      0xe80dc001 => 'srsdb sp, fiq',
+      0xe82dc002 => 'srsdb sp!, irq',
+      
+      0xe88107fc => 'stm.w r1, {r2, r3, r4, r5, r6, r7, r8, r9, sl}',
+    }
+    
+    special_cases.each do |val, opc|
+      it "parses 0x#{val.to_s 16} as \"#{opc}\"" do
+        i = Indis::ARM::UalLoader.instance.map_instruction(Indis::ARM::Instruction.new(4, 0), val, :thumb32)
+        i.should decode_to_opcode(opc)
+      end
+    end
+    
+  end
 end

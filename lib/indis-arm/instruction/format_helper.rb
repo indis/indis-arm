@@ -62,7 +62,7 @@ module Indis
           end
         when :arm_mode
           modes = %w(usr fiq irq svc mon abt hyp und sys)
-          modes[val & 0xf]
+          modes[processed_val & 0xf]
         else
           raise RuntimeError, "Unknown formatter #{fmt} for #{val}, with traits #{@traits}"
         end

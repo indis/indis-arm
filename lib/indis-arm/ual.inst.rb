@@ -845,14 +845,15 @@ common :srs_rfe_wback_increment do |instr, bytes, name|
 
   common_lazy :it_conditional, instr, bytes
   instr.mnemonic = name + (increment ? 'ia' : 'db')
-  instr.values = { wback: wback, increment: increment, mode: mode }
+  instr.values = { wback: wback, increment: increment }
 end
 
 matcher :loadstore_multiple => :srs do |instr, bytes|
   mode = bytes[0..4]
   
   common :srs_rfe_wback_increment, instr, bytes, 'srs'
-  instr[:rn] = 13
+  instr.values[:mode] = mode
+  instr.values[:rn] = 13
   instr.operands = '{{rn}}{{iftrue<!>:wback}}, {{arm_mode:mode}}'
 end
 
@@ -862,7 +863,7 @@ matcher :loadstore_multiple => :rfe do |instr, bytes|
   raise UnpredictableError if instr.in_it? && !instr.last_in_it?
   
   common :srs_rfe_wback_increment, instr, bytes, 'rfe'
-  instr[:rn] = rn
+  instr.values[:rn] = rn
   instr.operands = '{{rn}}{{iftrue<!>:wback}}'
 end
 
