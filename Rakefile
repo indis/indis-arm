@@ -8,18 +8,16 @@ RSpec::Core::RakeTask.new('spec')
 
 LLVM_GCC = '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/llvm-gcc-4.2/bin/arm-apple-darwin10-llvm-gcc-4.2'
 
-file 'spec/fixtures/matcher-spec-gen.txt' => ['spec/fixtures/matcher-spec-gen.S'] do
-  sh "#{LLVM_GCC} -mthumb -c spec/fixtures/matcher-spec-gen.S -o spec/fixtures/matcher-spec-gen.o"
-  sh "otool -tvVB spec/fixtures/matcher-spec-gen.o | grep -E '^0' > spec/fixtures/matcher-spec-gen.txt"
-  FileUtils.rm_f('spec/fixtures/matcher-spec-gen.o')
+rule '.disasm' => ['.S'] do |t|
+  sh "#{LLVM_GCC} -mthumb -arch armv7 -c #{t.source} -o #{t.name}.o"
+  sh "otool -tvVB #{t.name}.o | grep -E '^0' > #{t.name}"
+  FileUtils.rm_f("#{t.name}.o")
 end
 
-file 'spec/fixtures/matcher-spec-it-gen.txt' => ['spec/fixtures/matcher-spec-it-gen.S'] do
-  sh "#{LLVM_GCC} -mthumb -c spec/fixtures/matcher-spec-it-gen.S -o spec/fixtures/matcher-spec-it-gen.o"
-  sh "otool -tvVB spec/fixtures/matcher-spec-it-gen.o | grep -E '^0' > spec/fixtures/matcher-spec-it-gen.txt"
-  FileUtils.rm_f('spec/fixtures/matcher-spec-it-gen.o')
-end
-
-task :fixtures => ['spec/fixtures/matcher-spec-gen.txt', 'spec/fixtures/matcher-spec-it-gen.txt']
+task :fixtures => [
+  'spec/fixtures/matcher-spec-gen.disasm',
+  'spec/fixtures/matcher-spec-it-gen.disasm',
+  'spec/fixtures/matcher-thumb2-is.disasm'
+]
 
 task :default => :spec

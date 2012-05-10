@@ -6,8 +6,8 @@ describe Indis::ARM::UalLoader do
     Indis::ARM::UalLoader.instance.commons.length.should > 0
   end
   
-  context "thumb parser" do
-    fixtures = open('spec/fixtures/matcher-spec-gen.txt').readlines.map { |l| l.strip.split("\t", 3) }
+  context "thumb-1 parser" do
+    fixtures = open('spec/fixtures/matcher-spec-gen.disasm').readlines.map { |l| l.strip.split("\t", 3) }
     
     fixtures.each do |(adr, val, opc)|
       opc.gsub!("\t", " ")
