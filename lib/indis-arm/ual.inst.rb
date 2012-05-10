@@ -732,7 +732,7 @@ end
 
 namespace :thumb32 do
 
-matcher :thumb => :thumb32 do |instr, bytes|
+matcher :thumb32 do |instr, bytes|
   op1 = bytes[27..28]
   op2 = bytes[20..26]
   op = bytes[15]
