@@ -51,6 +51,7 @@ module Indis
       def match(name, instr, bytes)
         instr.traits << name
         matcher = @namespaces[instr.namespace][name]
+        raise RuntimeError, "Broken traits chain #{instr.traits}" unless matcher
         instance_exec(instr, bytes, &matcher.proc)
       end
       

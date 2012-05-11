@@ -1,2 +1,3 @@
 00000000	e832c000	rfedb	r2!
 00000004	e993c000	rfeia	r3
+00000008	e92107fc	stmdb	r1!, {r2, r3, r4, r5, r6, r7, r8, r9, sl}

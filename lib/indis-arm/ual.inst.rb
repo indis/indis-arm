@@ -871,9 +871,15 @@ common :thumb2_wide do |instr, bytes|
   instr.mnemonic += '.w'
 end
 
-common :thumb32_ldm_stm do |instr, bytes, name|
+common :conditional_wide do |instr, bytes, name|
+  instr.mnemonic = name
+  common_lazy :it_conditional, instr, bytes
+  common_lazy :thumb2_wide, instr, bytes
+end
+
+common :thumb32_ldm_stm do |instr, bytes, mask, name, iswide|
   rn =        bytes[16..19]
-  registers = bytes[0..15] & 0b0101111111111111
+  registers = bytes[0..15] & mask
   w =         bytes[21]
   
   wback = (w == 1)
@@ -882,27 +888,49 @@ common :thumb32_ldm_stm do |instr, bytes, name|
   
   instr.mnemonic = name
   common_lazy :it_conditional, instr, bytes
-  common_lazy :thumb2_wide, instr, bytes
+  common_lazy :thumb2_wide, instr, bytes if iswide
   
   instr.values = { registers: registers, wback: wback, rn: rn }
   instr.operands = '{{rn}}{{iftrue<!>:wback}}, {{unwind_regs_a:registers}}'  
 end
 
 matcher :loadstore_multiple => :stm do |instr, bytes|
-  common :thumb32_ldm_stm, instr, bytes, 'stm'
+  common :thumb32_ldm_stm, instr, bytes, 0b0101111111111111, 'stm', true
   rn = instr.values[:rn]
   registers = instr.values[:registers]
   raise UnpredictableError if rn == 15 || registers.length < 2
 end
 
 matcher :loadstore_multiple => :ldm do |instr, bytes|
-  common :thumb32_ldm_stm, instr, bytes, 'ldm'
+  common :thumb32_ldm_stm, instr, bytes, 0b1101111111111111, 'ldm', true
   rn = instr.values[:rn]
   registers = instr.values[:registers]
   wback = instr.values[:wback]
   raise UnpredictableError if rn == 15 || registers.length < 2 || (registers.include?(15) &&
                               registers.include?(14)) || (registers.include?(15) && instr.in_it? &&
                               !instr.last_in_it?) || (wback && registers.include?(rn))
+end
+
+matcher :loadstore_multiple => :pop do |instr, bytes|
+  registers = bytes[0..15] & 0b1101111111111111
+
+  common :conditional_wide, instr, bytes, 'pop'
+  registers = h.bits_array(registers)
+  
+  raise UnpredictableError if registers.length < 2 || (registers.include?(15) &&
+                              registers.include?(14)) || (registers.include?(15) &&
+                              instr.in_it? && !instr.last_in_it?)
+  
+  instr.values = { registers: registers, unaligned_allowed: false }
+  instr.operands = '{{unwind_regs_a:registers}}'
+end
+
+matcher :loadstore_multiple => :stmdb_fd do |instr, bytes|
+  common :thumb32_ldm_stm, instr, bytes, 0b0101111111111111, 'stmdb', false
+  registers = instr.values[:registers]
+  wback = instr.values[:wback]
+  rn = instr.values[:rn]
+  raise UnpredictableError if wback && registers.include?(rn)
 end
 
 end

@@ -74,6 +74,8 @@ describe Indis::ARM::UalLoader do
       
       0xe8930007 => 'ldm.w r3, {r0, r1, r2}',
       0xe8b41fe0 => 'ldm.w r4!, {r5, r6, r7, r8, r9, sl, fp, ip}',
+      
+      0xe8bd07fe => 'pop.w {r1, r2, r3, r4, r5, r6, r7, r8, r9, sl}',
     }
     
     special_cases.each do |val, opc|

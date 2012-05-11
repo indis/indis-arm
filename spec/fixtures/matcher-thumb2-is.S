@@ -12,3 +12,7 @@ rfeia r3
 
 // ldm.w r3, {r0-r2}
 // ldm.w r4!, {r5-r12}
+
+// pop {r1-r10}
+
+stmdb r1!, {r2-r10}
