@@ -35,7 +35,7 @@ module Indis
         begin
           opcode = bytes >> 11
           if opcode == 0b11101 || opcode == 0b11110 || opcode == 0b11111
-            # if it's Tummb2, read the trailing 2 bytes to 4 total
+            # if it's Thumb2, read the trailing 2 bytes to 4 total
             bytes = (bytes << 16) + io.read(2).unpack('v')[0]
             instr_size = 4
             root_matcher = :thumb32
@@ -55,7 +55,7 @@ module Indis
           end
           
           # map traits
-          loader.map_instruction(instr, bytes, :thumb16)
+          loader.map_instruction(instr, bytes, root_matcher)
           
           # process IT instruction
           @it_conditions = instr.values[:conditions] if instr.traits.include?(:it)

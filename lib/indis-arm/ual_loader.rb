@@ -26,6 +26,7 @@ module Indis
     
     class BadMatchError < RuntimeError; end
     class UnpredictableError < RuntimeError; end
+    class UnknownInstructionError < RuntimeError; end
     
     class UalLoader
       include Singleton
