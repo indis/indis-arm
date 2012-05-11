@@ -933,4 +933,16 @@ matcher :loadstore_multiple => :stmdb_fd do |instr, bytes|
   raise UnpredictableError if wback && registers.include?(rn)
 end
 
+matcher :loadstore_multiple => :push do |instr, bytes|
+  registers = bytes[0..15] & 0b0101111111111111
+
+  common :conditional_wide, instr, bytes, 'push'
+  registers = h.bits_array(registers)
+  
+  raise UnpredictableError if registers.length < 2
+  
+  instr.values = { registers: registers, unaligned_allowed: false }
+  instr.operands = '{{unwind_regs_a:registers}}'
+end
+
 end
