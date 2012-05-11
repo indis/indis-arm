@@ -21,6 +21,10 @@ require 'indis-core/binaryops_string'
 module Indis
   module ARM
     class UalInstructionsHelper
+      def bits_array(i)
+        i.to_s(2).reverse!.split('').each_with_index.map { |val,idx| val == '1' ? idx : nil }.compact
+      end
+      
       def ZeroExtend(bits_x, i)
         bits_x.to_bo.zero_extend(i).to_i
       end

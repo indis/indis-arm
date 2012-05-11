@@ -70,6 +70,10 @@ describe Indis::ARM::UalLoader do
       0xe82dc002 => 'srsdb sp!, irq',
       
       0xe88107fc => 'stm.w r1, {r2, r3, r4, r5, r6, r7, r8, r9, sl}',
+      0xe8a20038 => 'stm.w r2!, {r3, r4, r5}',
+      
+      0xe8930007 => 'ldm.w r3, {r0, r1, r2}',
+      0xe8b41fe0 => 'ldm.w r4!, {r5, r6, r7, r8, r9, sl, fp, ip}',
     }
     
     special_cases.each do |val, opc|

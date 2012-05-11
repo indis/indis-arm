@@ -625,7 +625,7 @@ end
 
 common :pushpopregs do |instr, bytes|
   registers = (bytes & 0b11111111)
-  registers = registers.to_s(2).reverse!.split('').each_with_index.map { |val,idx| val == "1" ? idx : nil }.compact
+  registers = h.bits_array(registers)
   raise UnpredictableError if registers.length < 1
   instr.values = { registers: registers }
 end
@@ -871,21 +871,38 @@ common :thumb2_wide do |instr, bytes|
   instr.mnemonic += '.w'
 end
 
-matcher :loadstore_multiple => :stm do |instr, bytes|
+common :thumb32_ldm_stm do |instr, bytes, name|
   rn =        bytes[16..19]
   registers = bytes[0..15] & 0b0101111111111111
   w =         bytes[21]
   
   wback = (w == 1)
-  registers = registers.to_s(2).reverse!.split('').each_with_index.map { |val,idx| val == "1" ? idx : nil }.compact
+  registers = h.bits_array(registers)
   raise UnpredictableError if rn == 15 || registers.length < 2
   
-  instr.mnemonic = 'stm'
+  instr.mnemonic = name
   common_lazy :it_conditional, instr, bytes
   common_lazy :thumb2_wide, instr, bytes
   
   instr.values = { registers: registers, wback: wback, rn: rn }
-  instr.operands = '{{rn}}{{iftrue<!>:wback}}, {{unwind_regs_a:registers}}'
+  instr.operands = '{{rn}}{{iftrue<!>:wback}}, {{unwind_regs_a:registers}}'  
+end
+
+matcher :loadstore_multiple => :stm do |instr, bytes|
+  common :thumb32_ldm_stm, instr, bytes, 'stm'
+  rn = instr.values[:rn]
+  registers = instr.values[:registers]
+  raise UnpredictableError if rn == 15 || registers.length < 2
+end
+
+matcher :loadstore_multiple => :ldm do |instr, bytes|
+  common :thumb32_ldm_stm, instr, bytes, 'ldm'
+  rn = instr.values[:rn]
+  registers = instr.values[:registers]
+  wback = instr.values[:wback]
+  raise UnpredictableError if rn == 15 || registers.length < 2 || (registers.include?(15) &&
+                              registers.include?(14)) || (registers.include?(15) && instr.in_it? &&
+                              !instr.last_in_it?) || (wback && registers.include?(rn))
 end
 
 end
