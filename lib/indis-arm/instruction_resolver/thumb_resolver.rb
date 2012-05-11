@@ -30,31 +30,40 @@ module Indis
       def resolve(io, vmbase)
         loader = UalLoader.instance
         
+        # read the initial 2 bytes
         bytes = io.read(2).unpack('v')[0]
         begin
           opcode = bytes >> 11
           if opcode == 0b11101 || opcode == 0b11110 || opcode == 0b11111
+            # if it's Tummb2, read the trailing 2 bytes to 4 total
             bytes = (bytes << 16) + io.read(2).unpack('v')[0]
-            
-            
-            vmbase += 2
+            instr_size = 4
+            root_matcher = :thumb32
           else
-            instr = Instruction.new(2, vmbase)
-            if @it_conditions.length > 0
-              instr.it_mnemonic = @it_conditions.shift
-              instr.in_it = true
-              instr.last_in_it = @it_conditions.length == 0
-            end
-            
-            loader.map_instruction(instr, bytes, :thumb16)
-            if instr.traits.include?(:it)
-              @it_conditions = instr.values[:conditions]
-            end
-            
-            yield instr
-            
-            vmbase += 2
+            instr_size = 2
+            root_matcher = :thumb16
           end
+          
+          # create a new instruction
+          instr = Instruction.new(instr_size, vmbase)
+          
+          # map IT conditions if applicable
+          if @it_conditions.length > 0
+            instr.it_mnemonic = @it_conditions.shift
+            instr.in_it = true
+            instr.last_in_it = @it_conditions.length == 0
+          end
+          
+          # map traits
+          loader.map_instruction(instr, bytes, :thumb16)
+          
+          # process IT instruction
+          @it_conditions = instr.values[:conditions] if instr.traits.include?(:it)
+          
+          # yield to outer world
+          yield instr
+          
+          vmbase += instr_size
           
           bytes = io.read(2)
           bytes = bytes.unpack('v')[0] if bytes
