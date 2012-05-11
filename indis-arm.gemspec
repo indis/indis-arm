@@ -18,5 +18,5 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency 'rspec'
   gem.add_development_dependency 'indis-macho', '~> 0.3.0'
-  gem.add_runtime_dependency 'indis-core', '~> 0.1.2'
+  gem.add_runtime_dependency 'indis-core', '~> 0.1.4'
 end
